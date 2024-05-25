@@ -5,6 +5,10 @@ import { slateEditor } from '@payloadcms/richtext-slate';
 import path from 'path';
 import dotenv from 'dotenv';
 import { RichTextAdapter } from 'payload/types';
+import { Users } from './collections/Users';
+import { Products } from './collections/Products/Products';
+import { Media } from './collections/Media';
+import Orders from './collections/Orders';
 
 dotenv.config({
   path: path.resolve(__dirname, '../.env'),
@@ -14,12 +18,13 @@ dotenv.config({
 const editor = slateEditor({}) as unknown as RichTextAdapter<any[], any, any>;
 
 export default buildConfig({
-  serverURL: process.env.NEXT_PUBLIC_SERVER_URL || '',
-  collections: [], 
+  serverURL: process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000',
+  collections: [Users, Products, Media, Orders], 
   routes: {
     admin: '/sell',
   },
   admin: {
+    user: 'users',
     bundler: webpackBundler(),
     meta: {
       titleSuffix: '- MegaAfricanMarket',

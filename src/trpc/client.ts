@@ -5,5 +5,4 @@ export const trpc = createTRPCReact<AppRouter>({})
 
 const trpcUrl = '/api/trpc';
 
-export const trpcClient = createTRPCReact<AppRouter>({
-  });
+export const trpcClient = createTRPCReact<AppRouter>({});

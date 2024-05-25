@@ -1,4 +1,5 @@
 import MaxWidthWrapper from '@/components/MaxWidthWrapper';
+import ProductReel from '@/components/ProductReel';
 import { buttonVariants } from '@/components/ui/button';
 import { CheckCircle, Leaf, Truck } from 'lucide-react';
 import Image from 'next/image';
@@ -29,19 +30,26 @@ export default function Home() {
       <MaxWidthWrapper>
         <div className="flex flex-col md:flex-row">
           <div className="md:w-1/2 py-20 mx-auto text-center flex flex-col items-center max-w-3xl md:pr-12">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+            <h1 className="text-4xl font-bold tracking-tight text-gray-800 sm:text-5xl">
               Explore Your Ultimate One-Stop Shop for Quality{' '}
-              <span className="text-green-700">African Groceries!</span>
+              <span style={{ display: 'inline' }} className="text-green-700">
+                African
+              </span>{' '}
+              &{' '}
+              <span style={{ display: 'inline' }} className="text-red-600">
+                Caribbean
+              </span>{' '}
+              Groceries!
             </h1>
+
             <p className="mt-6 text-lg max-w-prose text-muted-foreground">
               Welcome to{' '}
-              <span className="text-green-800 text-bold-3xl">
-                Mega African Market:
-              </span>{' '}
-              We Offer High-Quality and Fresh Ingredients for African Cuisine
+              <span className="text-red-600 text-xl">Mega African Market:</span>{' '}
+              We Offer High-Quality and Fresh Ingredients for African &
+              Caribbean Cuisine
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mt-6">
-              <Link href="/products" className={buttonVariants()}>
+              <Link href="/product" className={buttonVariants()}>
                 Shop Now
               </Link>
             </div>
@@ -50,12 +58,18 @@ export default function Home() {
             <Image
               src="/hero.png"
               alt="hero"
-              width={600}
-              height={450}
+              width={500}
+              height={500}
               className="object-contain"
             />
           </div>
         </div>
+        <hr className="my-8 border-gray-300" />
+        <ProductReel
+          query={{ sort: 'desc', limit: 8 }}
+          href="/products"
+          title="Our Products"
+        />
       </MaxWidthWrapper>
       <section className="border-t border-gray-200 bg-gray-50">
         <MaxWidthWrapper className="py-20">

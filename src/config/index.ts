@@ -5,15 +5,27 @@ export const PRODUCT_CATEGORIES = [
       featured: [
         {
           name: 'Seafood',
-          href: `/products?category=Seafood`,
+          href: '/products?category=seafood',
         },
         {
           name: 'Fresh Produces',
-          href: '/products?category=Fresh_Produce&sort=desc',
+          href: '/products?category=fresh_produce',
         },
         {
           name: 'Meat and Poultry',
           href: '/products?category=meat_poultry',
+        },
+        {
+          name: "Kellogg's",
+          href: `/products?category=kelloggs`,
+        },
+        {
+          name: 'Nestlé',
+          href: '/products?category=nestlé',
+        },
+        {
+          name: 'Coca-Cola',
+          href: '/products?category=coca_cola',
         },
       ],
     },
@@ -22,7 +34,7 @@ export const PRODUCT_CATEGORIES = [
       value: 'brands' as const,
       featured: [
         {
-          name: 'Kellogg',
+          name: "Kellogg's",
           href: `/products?brands=kellogg`,
         },
         {
@@ -31,7 +43,7 @@ export const PRODUCT_CATEGORIES = [
         },
         {
           name: 'Coca-Cola',
-          href: '/products?brands=Coca-Cola          ',
+          href: '/products?brands=Coca-Cola',
         },
       ],
     },

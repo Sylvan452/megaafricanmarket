@@ -1,6 +1,6 @@
 @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
+@tailwind components;
+@tailwind utilities;
 
   
 @layer base {
@@ -58,3 +58,50 @@
       @apply bg-background text-foreground;
     }
   }
+  .swiper-pagination-bullet {
+    width: 7px !important;
+    height: 7px !important;
+    background: rgba(255, 255, 255, 0.2);
+    scale: 0.9 !important;
+  }
+  .swiper-pagination-bullet-active {
+    color: #fff;
+    background: white !important;
+    scale: 1 !important;
+  }
+
+  /* CSS to remove the spinner controls in number inputs */
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.no-spinner {
+  -moz-appearance: textfield;
+}
+.skeleton {
+  background: #e0e0e0;
+  height: 200px;
+}
+
+.product-card {
+  border: 1px solid #e0e0e0;
+  padding: 16px;
+  text-align: center;
+}
+
+.product-image {
+  width: 100%;
+  height: auto;
+}
+
+.product-name {
+  font-size: 1.2em;
+  margin-top: 8px;
+}
+
+.product-price {
+  color: #888;
+  margin-top: 4px;
+}
