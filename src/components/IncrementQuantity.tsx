@@ -1,61 +1,47 @@
-import React, { useState, ChangeEvent } from 'react';
+import { useState } from 'react';
+import { useCart } from '@/hooks/use-cart';
 
-type IncrementQuantityProps = {
-  initialQuantity?: number;
-  onChange?: (newQuantity: number) => void;
-};
+interface IncrementQuantityProps {
+  productId: string;
+  initialQuantity: number;
+  onQuantityChange: (quantity: number) => void;
+}
 
 const IncrementQuantity: React.FC<IncrementQuantityProps> = ({
-  initialQuantity = 1,
-  onChange,
+  productId,
+  initialQuantity,
+  onQuantityChange,
 }) => {
   const [quantity, setQuantity] = useState(initialQuantity);
+  const { updateItemQuantity } = useCart();
 
-  const handleIncrement = () => {
+  const increment = () => {
     const newQuantity = quantity + 1;
     setQuantity(newQuantity);
-    if (onChange) {
-      onChange(newQuantity);
-    }
+    updateItemQuantity(productId, newQuantity);
+    onQuantityChange(newQuantity);
   };
 
-  const handleDecrement = () => {
-    const newQuantity = Math.max(quantity - 1, 0);
-    setQuantity(newQuantity);
-    if (onChange) {
-      onChange(newQuantity);
-    }
-  };
-
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const newQuantity = parseInt(event.target.value, 10);
-    if (!isNaN(newQuantity) && newQuantity >= 0) {
+  const decrement = () => {
+    if (quantity > 1) {
+      const newQuantity = quantity - 1;
       setQuantity(newQuantity);
-      if (onChange) {
-        onChange(newQuantity);
-      }
+      updateItemQuantity(productId, newQuantity);
+      onQuantityChange(newQuantity);
     }
   };
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center space-x-2">
       <button
-        onClick={handleDecrement}
-        className="border-muted-foreground px-2 py-1"
+        onClick={decrement}
+        disabled={quantity <= 1}
+        className="decrement-button"
       >
         -
       </button>
-      <input
-        type="number"
-        min="0"
-        value={quantity}
-        onChange={handleChange}
-        className="text-center border border-muted-foreground w-10 h-5 px-2 py-1 no-spinner"
-      />
-      <button
-        onClick={handleIncrement}
-        className="border-muted-foreground px-2 py-1"
-      >
+      <span>{quantity}</span>
+      <button onClick={increment} className="increment-button">
         +
       </button>
     </div>

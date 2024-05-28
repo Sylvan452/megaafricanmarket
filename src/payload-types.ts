@@ -116,6 +116,7 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
   price_SHIPPING: string;
+  totalAmount: number;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

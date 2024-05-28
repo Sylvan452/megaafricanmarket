@@ -1,9 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
-import { Products } from '@/collections/Products/Products';
 
 const SearchBar = () => {
   const searchParams = useSearchParams();
@@ -12,7 +10,6 @@ const SearchBar = () => {
 
   const handleSearch = (searchTerm: string) => {
     const params = new URLSearchParams(searchParams as any);
-    console.log(Products);
     if (searchTerm) {
       params.set('query', searchTerm);
     } else {

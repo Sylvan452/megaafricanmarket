@@ -4,10 +4,12 @@ import NavItems from './NavItems';
 import Image from 'next/image';
 import { buttonVariants } from './ui/button';
 import Cart from './Cart';
+import Wishlist from './Wishlist';
 import { cookies } from 'next/headers';
 import { getServerSideUser } from '@/lib/payload.utils';
 import UserAccountNav from './UserAccountNav';
 import dynamic from 'next/dynamic';
+import MobileNav from './MobileNav';
 
 const SearchBar = dynamic(() => import('./SearchBar'), { ssr: false });
 
@@ -29,6 +31,7 @@ const Navbar = async ({
           <div className="border-b border-gray-200">
             <div className="flex h-16 items-center">
               {/* Mobile nav */}
+              <MobileNav />
               <div className="ml-4 flex lg:ml-0">
                 <Link href="/">
                   <Image src="/logo.png" alt="hero" width={80} height={80} />
@@ -40,7 +43,7 @@ const Navbar = async ({
               </div>
 
               {/* Search Bar */}
-              <div className="flex-1 mx-4">
+              <div className="hidden lg:flex flex-1 mx-4">
                 <SearchBar />
               </div>
 
@@ -68,24 +71,13 @@ const Navbar = async ({
                         variant: 'ghost',
                       })}
                     >
-                      Create account
+                      Create Account
                     </Link>
                   )}
-                  {user ? (
-                    <span className="h-6 w-px bg-gray-200" aria-hidden="true" />
-                  ) : null}
-
-                  {user ? null : (
-                    <div className="flex lg:ml-6">
-                      <span
-                        className="h-6 w-px bg-gray-200"
-                        aria-hidden="true"
-                      />
-                    </div>
-                  )}
-                  <div className="ml-4 flow-root lg:ml-6">
-                    <Cart />
-                  </div>
+                </div>
+                <div className="hidden lg:flex">
+                  <Cart />
+                  <Wishlist />
                 </div>
               </div>
             </div>

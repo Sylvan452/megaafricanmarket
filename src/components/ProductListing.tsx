@@ -1,12 +1,14 @@
-'use client';
-
-import { Product } from '@/payload-types';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Skeleton } from './ui/skeleton';
-import Link from 'next/link';
 import { cn, formatPrice } from '@/lib/utils';
 import { PRODUCT_CATEGORIES } from '@/config';
 import ImageSlider from './ImageSlider';
+import { HeartIcon } from 'lucide-react';
+import { useWishlist } from '@/contexts/WishlistContext';
+import Link from 'next/link';
+import Image from 'next/image';
+import image from 'next/image';
+import { Product } from '@/payload-types';
 
 interface ProductListingProps {
   product: Product | null;
@@ -15,6 +17,10 @@ interface ProductListingProps {
 
 const ProductListing = ({ product, index }: ProductListingProps) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
+  const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
+  const isWishlisted = product?.id
+    ? wishlist.some((item) => item.id === product.id)
+    : false;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -24,36 +30,55 @@ const ProductListing = ({ product, index }: ProductListingProps) => {
     return () => clearTimeout(timer);
   }, [index]);
 
-  if (!product || !isVisible) return <ProductPlaceholder />;
+  const handleWishlistToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!product || !product.id) return;
+
+    if (isWishlisted) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product);
+    }
+  };
 
   // Find the category name based on the product's category value
-  const categoryName = PRODUCT_CATEGORIES.find(
-    ({ value }) => value === 'Categories',
-  )?.featured.find(({ href }) => href.includes(product.category))?.name;
+  const categoryName =
+    PRODUCT_CATEGORIES.find(
+      ({ value }) => value === 'Categories',
+    )?.featured.find(({ href }) => href.includes(product?.category || ''))
+      ?.name || 'Unknown Category';
 
-  const validUrls = product.images
-    .map(({ image }) => (typeof image === 'string' ? image : image.url))
+  const validUrls = product?.images
+    ?.map(({ image }) => (typeof image === 'string' ? image : image.url))
     .filter(Boolean) as string[];
 
   return (
-    <Link
-      className={cn('invisible h-full w-full cursor-pointer group/main', {
-        'visible animate-in fade-in-5': isVisible,
-      })}
-      href={`/product/${product.id}`}
-    >
-      <div className="border border-gray-300 rounded-md p-4 flex flex-col w-full h-full">
-        {/* Assuming ImageSlider and validUrls are defined elsewhere */}
-        <ImageSlider urls={validUrls} />
-        <h3 className="mt-4 font-medium text-sm text-gray-700">
-          {product.name}
-        </h3>
-        <p className="mt-1 text-sm text-gray-500">{categoryName}</p>
-        <p className="mt-1 font-medium text-sm text-gray-900">
-          {formatPrice(product.price)}
-        </p>
-      </div>
-    </Link>
+    <div className="relative border border-gray-300 rounded-md p-4 flex flex-col w-full h-full">
+      <button
+        className="absolute top-2 right-2 z-10"
+        onClick={handleWishlistToggle}
+      >
+        <HeartIcon
+          className={isWishlisted ? 'text-red-500' : 'text-gray-300'}
+        />
+      </button>
+      <Link href={`/product/${product?.id}`} className="group/main">
+        <div
+          className={cn('invisible h-full w-full cursor-pointer', {
+            'visible animate-in fade-in-5': isVisible,
+          })}
+        >
+          <ImageSlider urls={validUrls} />
+          <h3 className="mt-4 font-medium text-sm text-gray-700">
+            {product?.name || 'Unknown Product'}
+          </h3>
+          <p className="mt-1 text-sm text-gray-500">{categoryName}</p>
+          <p className="mt-1 font-medium text-sm text-gray-900">
+            {formatPrice(product?.price || 0)}
+          </p>
+        </div>
+      </Link>
+    </div>
   );
 };
 

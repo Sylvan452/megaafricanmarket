@@ -10,10 +10,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import IncrementQuantity from '@/components/IncrementQuantity';
+import CartItem from '@/components/CartItem'; // Make sure to import CartItem
 
 const Page = () => {
-  const { items, removeItem } = useCart();
-
+  const { items, removeItem, updateItemQuantity } = useCart();
   const router = useRouter();
 
   const { mutate: createCheckoutSession, isLoading } =
@@ -28,15 +29,35 @@ const Page = () => {
   const [isMounted, setIsMounted] = useState<boolean>(false);
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+    recalculateTotal();
+  }, [items]);
 
-  const cartTotal = items.reduce(
-    (total, { product }) => total + product.price,
-    0,
-  );
+  const [cartTotal, setCartTotal] = useState<number>(0);
+
+  const recalculateTotal = () => {
+    const total = items.reduce(
+      (sum, { product, quantity }) => sum + product.price * quantity,
+      0,
+    );
+    setCartTotal(total);
+  };
+
+  const handleQuantityChange = (productId: string, quantity: number) => {
+    updateItemQuantity(productId, quantity);
+    recalculateTotal();
+  };
 
   const fee = 1;
   const deliveryfee = 2;
+
+  const calculateTotalAmount = (): number => {
+    return cartTotal + fee + deliveryfee;
+  };
+
+  const handleCheckout = () => {
+    const totalAmount = calculateTotalAmount();
+    createCheckoutSession({ productIds, totalAmount });
+  };
 
   return (
     <div className="bg-white">
@@ -81,7 +102,7 @@ const Page = () => {
               })}
             >
               {isMounted &&
-                items.map(({ product }) => {
+                items.map(({ product, quantity }) => {
                   const categoryName = PRODUCT_CATEGORIES.find(
                     ({ value }) => value === 'Categories',
                   )?.featured.find(({ href }) =>
@@ -91,65 +112,12 @@ const Page = () => {
                   const { image } = product.images[0];
 
                   return (
-                    <li key={product.id} className="flex py-6 sm:py-10">
-                      <div className="flex-shrink-0">
-                        <div className="relative h-24 w-24">
-                          {typeof image !== 'string' && image.url ? (
-                            <Image
-                              fill
-                              src={image.url}
-                              alt="product image"
-                              className="h-full w-full rounded-md object-cover object-center sm:h-48 sm:w-48"
-                            />
-                          ) : null}
-                        </div>
-                      </div>
-
-                      <div className="ml-4 flex flex-1 flex-col justify-between sm:ml-6">
-                        <div className="relative pr-9 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:pr-0">
-                          <div>
-                            <div className="flex justify-between">
-                              <h3 className="text-sm">
-                                <Link
-                                  href={`/product/${product.id}`}
-                                  className="font-medium text-gray-700 hover:text-gray-800"
-                                >
-                                  {product.name}
-                                </Link>
-                              </h3>
-                            </div>
-
-                            <div className="mt-1 flex text-sm">
-                              <p className="text-muted-foreground">
-                                Category: {categoryName}
-                              </p>
-                            </div>
-
-                            <p className="mt-1 text-sm font-medium text-gray-900">
-                              {formatPrice(product.price)}
-                            </p>
-                          </div>
-
-                          <div className="mt-4 sm:mt-0 sm:pr-9 w-20">
-                            <div className="absolute right-0 top-0">
-                              <Button
-                                aria-label="remove product"
-                                onClick={() => removeItem(product.id)}
-                                variant="ghost"
-                              >
-                                <X className="h-5 w-5" aria-hidden="true" />
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-
-                        <p className="mt-4 flex space-x-2 text-sm text-gray-700">
-                          <Check className="h-5 w-5 flex-shrink-0 text-green-500" />
-
-                          <span>Eligible for instant delivery</span>
-                        </p>
-                      </div>
-                    </li>
+                    <CartItem
+                      key={product.id}
+                      product={product}
+                      initialQuantity={quantity}
+                      onQuantityChange={handleQuantityChange}
+                    />
                   );
                 })}
             </ul>
@@ -212,7 +180,7 @@ const Page = () => {
             <div className="mt-6">
               <Button
                 disabled={items.length === 0 || isLoading}
-                onClick={() => createCheckoutSession({ productIds })}
+                onClick={handleCheckout} // Use handleCheckout here
                 className="w-full"
                 size="lg"
               >

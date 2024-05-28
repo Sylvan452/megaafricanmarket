@@ -7,10 +7,10 @@ import type Stripe from 'stripe';
 
 export const paymentRouter = router({
   createSession: privateProcedure
-    .input(z.object({ productIds: z.array(z.string()) }))
+    .input(z.object({ productIds: z.array(z.string()), totalAmount: z.number() })) // Added totalAmount here
     .mutation(async ({ ctx, input }) => {
       const { user } = ctx;
-      const { productIds } = input;
+      const { productIds, totalAmount } = input; // Destructure totalAmount from input
 
       if (productIds.length === 0) {
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'No product IDs provided' });
@@ -31,12 +31,12 @@ export const paymentRouter = router({
           throw new TRPCError({ code: 'NOT_FOUND', message: 'No products found for provided IDs' });
         }
 
-        const filteredProducts = products.filter((prod) => Boolean(prod.priceId));
+        const filteredProducts = products.filter((prod) => prod.priceId && typeof prod.priceId === 'string');
         if (filteredProducts.length === 0) {
           throw new TRPCError({ code: 'BAD_REQUEST', message: 'None of the products have a valid priceId' });
         }
 
-        // Create order with user ID and product IDs
+        // Create order with user ID, product IDs, and total amount
         const order = await payload.create({
           collection: 'orders',
           data: {
@@ -45,12 +45,13 @@ export const paymentRouter = router({
             user: user.id,
             orderedBy: user.id,
             price_SHIPPING: '',
+            totalAmount, // Store the total amount in the order
           },
         });
 
         // Construct line items for Stripe checkout
         const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = filteredProducts.map((product) => ({
-          price: "price_1PIwsWL49CdCQGXa5KDkbj8Y",
+          price: product.priceId as string,
           quantity: 1,
           adjustable_quantity: {
             enabled: true,
@@ -64,7 +65,7 @@ export const paymentRouter = router({
             throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Shipping price ID not set in environment' });
           }
           line_items.push({
-            price: "price_1PJcdeL49CdCQGXasXyI8sqE",
+            price: shippingPriceId,
             quantity: 1,
             adjustable_quantity: {
               enabled: false,

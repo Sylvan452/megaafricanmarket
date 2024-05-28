@@ -1,19 +1,33 @@
-import { PRODUCT_CATEGORIES } from '@/config';
+import React from 'react';
 import { useCart } from '@/hooks/use-cart';
+import { PRODUCT_CATEGORIES } from '@/config';
 import { formatPrice } from '@/lib/utils';
 import { Product } from '@/payload-types';
 import { ImageIcon, X } from 'lucide-react';
 import Image from 'next/image';
 import IncrementQuantity from './IncrementQuantity';
 
-const CartItem = ({ product }: { product: Product }) => {
-  const { image } = product.images[0];
+interface CartItemProps {
+  product: Product;
+  initialQuantity: number;
+  onQuantityChange: (productId: string, quantity: number) => void;
+}
 
+const CartItem: React.FC<CartItemProps> = ({
+  product,
+  initialQuantity,
+  onQuantityChange,
+}) => {
+  const { image } = product.images[0];
   const { removeItem } = useCart();
 
   const categoryName = PRODUCT_CATEGORIES.find(
     ({ value }) => value === 'Categories',
   )?.featured.find(({ href }) => href.includes(product.category))?.name;
+
+  const handleQuantityChange = (quantity: number) => {
+    onQuantityChange(product.id, quantity);
+  };
 
   return (
     <div className="space-y-3 py-2">
@@ -24,7 +38,8 @@ const CartItem = ({ product }: { product: Product }) => {
               <Image
                 src={image.url}
                 alt={product.name}
-                fill
+                width={40}
+                height={40}
                 className="absolute object-cover"
               />
             ) : (
@@ -58,11 +73,15 @@ const CartItem = ({ product }: { product: Product }) => {
           </div>
         </div>
         <div className="flex flex-col items-center justify-center">
-          <IncrementQuantity />
+          <IncrementQuantity
+            productId={product.id}
+            initialQuantity={initialQuantity}
+            onQuantityChange={handleQuantityChange} // Pass the handleQuantityChange function
+          />
         </div>
         <div className="flex flex-col space-y-1 font-medium">
           <span className="ml-auto line-clamp-1 text-sm">
-            {formatPrice(product.price)}
+            {formatPrice(product.price * initialQuantity)}
           </span>
         </div>
       </div>

@@ -11,16 +11,16 @@ import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ImageSliderProps {
-  urls: string[];
+  urls?: string[];
 }
 
-const ImageSlider = ({ urls }: ImageSliderProps) => {
+const ImageSlider = ({ urls = [] }: ImageSliderProps) => {
   const [swiper, setSwiper] = useState<null | SwiperType>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
   const [slideConfig, setSlideConfig] = useState({
     isBeginning: true,
-    isEnd: activeIndex === (urls.length ?? 0) - 1,
+    isEnd: urls.length === 0 || activeIndex === urls.length - 1,
   });
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const ImageSlider = ({ urls }: ImageSliderProps) => {
       setActiveIndex(activeIndex);
       setSlideConfig({
         isBeginning: activeIndex === 0,
-        isEnd: activeIndex === (urls.length ?? 0) - 1,
+        isEnd: urls.length === 0 || activeIndex === urls.length - 1,
       });
     });
   }, [swiper, urls]);

@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useEffect, useState } from 'react';
 import { ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -17,21 +18,68 @@ import { buttonVariants } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
 import { useCart } from '@/hooks/use-cart';
 import CartItem from './CartItem';
-import { useEffect, useState } from 'react';
+import { calculateShippingCost } from '@/lib/utils';
 
 const Cart = () => {
   const { items } = useCart();
   const itemCount = items.length;
 
-  const [isMounted, setIsMounted] = useState<boolean>(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [deliveryMethod, setDeliveryMethod] = useState('ship');
+  const [distance, setDistance] = useState(0);
+  const [deliveryFee, setDeliveryFee] = useState(0);
+
+  // Additional state for shipping details
+  const [shippingDetails, setShippingDetails] = useState({
+    country: 'US',
+    firstName: '',
+    lastName: '',
+    address: '',
+    apartment: '',
+    city: '',
+    zip: '',
+    phone: '',
+  });
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
-  const cartTotal = items.reduce(
-    (total, { product }) => total + product.price,
-    0,
-  );
+    recalculateTotal();
+  }, [items, deliveryMethod, distance]);
+
+  const recalculateTotal = () => {
+    const total = items.reduce(
+      (sum, { product, quantity }) => sum + product.price * quantity,
+      0,
+    );
+    setTotalPrice(total);
+    setDeliveryFee(calculateShippingCost(distance));
+  };
+
+  const handleQuantityChange = (productId: string, quantity: number) => {
+    const item = items.find((item) => item.product.id === productId);
+    if (item) {
+      item.quantity = quantity;
+      recalculateTotal();
+    }
+  };
+
+  const handleDeliveryMethodChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setDeliveryMethod(event.target.value);
+  };
+
+  const handleDistanceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setDistance(parseFloat(event.target.value));
+  };
+
+  const handleShippingDetailChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value } = event.target;
+    setShippingDetails((prevDetails) => ({ ...prevDetails, [name]: value }));
+  };
 
   const fee = 1;
 
@@ -47,76 +95,224 @@ const Cart = () => {
         </span>
       </SheetTrigger>
       <SheetContent className="flex w-full flex-col pr-0 sm:max-w-lg">
-        <SheetHeader className="space-y-2.5 pr-6">
-          <SheetTitle>Cart ({itemCount})</SheetTitle>
-        </SheetHeader>
-        {itemCount > 0 ? (
-          <>
-            <div className="flex w-full flex-col pr-6">
-              <ScrollArea>
-                {items.map(({ product }) => (
-                  <CartItem product={product} key={product.id} />
-                ))}
-              </ScrollArea>
-            </div>
-            <div className="space-y-4 pr-6">
-              <Separator />
-              <div className="space-y-1.5 text-sm">
-                <div className="flex">
-                  <span className="flex-1">Shipping</span>
-                  <span>Free</span>
+        <ScrollArea className="h-full">
+          <div className="flex flex-col pr-6">
+            <SheetHeader className="space-y-2.5">
+              <SheetTitle>Cart ({itemCount})</SheetTitle>
+            </SheetHeader>
+            {itemCount > 0 ? (
+              <>
+                <div className="flex flex-col">
+                  {items.map(({ product, quantity }) => (
+                    <CartItem
+                      product={product}
+                      key={product.id}
+                      initialQuantity={quantity}
+                      onQuantityChange={handleQuantityChange}
+                    />
+                  ))}
                 </div>
-                <div className="flex">
-                  <span className="flex-1">Transation Fee</span>
-                  <span>{formatPrice(fee)}</span>
+                <div className="space-y-4">
+                  <Separator />
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="ship"
+                        name="deliveryMethod"
+                        value="ship"
+                        checked={deliveryMethod === 'ship'}
+                        onChange={handleDeliveryMethodChange}
+                      />
+                      <label htmlFor="ship">
+                        Ship{' '}
+                        <span className="text-xs block sm:inline">
+                          (Free shipping within 5 miles; additional charges may
+                          apply)
+                        </span>
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="pickup"
+                        name="deliveryMethod"
+                        value="pickup"
+                        checked={deliveryMethod === 'pickup'}
+                        onChange={handleDeliveryMethodChange}
+                      />
+                      <label htmlFor="pickup">Pick Up</label>
+                    </div>
+                    {deliveryMethod === 'ship' && (
+                      <>
+                        <div className="mt-4 space-y-2">
+                          <div>
+                            <label htmlFor="country">Country/Region</label>
+                            <select
+                              id="country"
+                              name="country"
+                              value={shippingDetails.country}
+                              onChange={handleShippingDetailChange}
+                              className="border p-1 w-full"
+                            >
+                              <option value="US">United States</option>
+                              <option value="CA">Canada</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label htmlFor="firstName">First Name</label>
+                            <input
+                              type="text"
+                              id="firstName"
+                              name="firstName"
+                              value={shippingDetails.firstName}
+                              onChange={handleShippingDetailChange}
+                              className="border p-1 w-full"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="lastName">Last Name</label>
+                            <input
+                              type="text"
+                              id="lastName"
+                              name="lastName"
+                              value={shippingDetails.lastName}
+                              onChange={handleShippingDetailChange}
+                              className="border p-1 w-full"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="address">Address</label>
+                            <input
+                              type="text"
+                              id="address"
+                              name="address"
+                              value={shippingDetails.address}
+                              onChange={handleShippingDetailChange}
+                              className="border p-1 w-full"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="apartment">
+                              Apartment, Suite, etc. (optional)
+                            </label>
+                            <input
+                              type="text"
+                              id="apartment"
+                              name="apartment"
+                              value={shippingDetails.apartment}
+                              onChange={handleShippingDetailChange}
+                              className="border p-1 w-full"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="city">City</label>
+                            <input
+                              type="text"
+                              id="city"
+                              name="city"
+                              value={shippingDetails.city}
+                              onChange={handleShippingDetailChange}
+                              className="border p-1 w-full"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="zip">Zip Code</label>
+                            <input
+                              type="text"
+                              id="zip"
+                              name="zip"
+                              value={shippingDetails.zip}
+                              onChange={handleShippingDetailChange}
+                              className="border p-1 w-full"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="phone">Phone Number</label>
+                            <input
+                              type="text"
+                              id="phone"
+                              name="phone"
+                              value={shippingDetails.phone}
+                              onChange={handleShippingDetailChange}
+                              className="border p-1 w-full"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2 mt-4">
+                          <label htmlFor="distance">Distance (miles):</label>
+                          <input
+                            type="number"
+                            id="distance"
+                            value={distance}
+                            onChange={handleDistanceChange}
+                            className="border p-1"
+                            min="0"
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  <Separator />
+                  <div className="space-y-1.5 text-sm">
+                    {deliveryMethod === 'ship' && (
+                      <div className="flex">
+                        <span className="flex-1">Shipping</span>
+                        <span>{formatPrice(deliveryFee)}</span>
+                      </div>
+                    )}
+                    <div className="flex">
+                      <span className="flex-1">Transaction Fee</span>
+                      <span>{formatPrice(fee)}</span>
+                    </div>
+                    <div className="flex">
+                      <span className="flex-1">Total</span>
+                      <span>{formatPrice(totalPrice + fee + deliveryFee)}</span>
+                    </div>
+                  </div>
+                  <SheetFooter>
+                    <SheetTrigger asChild>
+                      <Link
+                        href="/cart"
+                        className={buttonVariants({
+                          className: 'w-full',
+                        })}
+                      >
+                        Continue to checkout
+                      </Link>
+                    </SheetTrigger>
+                  </SheetFooter>
                 </div>
-                <div className="flex">
-                  <span className="flex-1">Total</span>
-                  <span>{formatPrice(cartTotal + fee)}</span>
+              </>
+            ) : (
+              <div className="flex h-full flex-col items-center justify-center space-y-1">
+                <div
+                  aria-hidden="true"
+                  className="relative mb-4 h-60 w-60 text-muted-foreground"
+                >
+                  <Image
+                    src="/hippo-empty-cart.png"
+                    fill
+                    alt="empty shopping cart hippo"
+                  />
                 </div>
-              </div>
-              <SheetFooter>
+                <div className="text-xl font-semibold">Your cart is empty</div>
                 <SheetTrigger asChild>
                   <Link
-                    href="/cart"
+                    href="/products"
                     className={buttonVariants({
-                      className: 'w-full',
+                      variant: 'link',
+                      size: 'sm',
+                      className: 'text-sm text-muted-foreground',
                     })}
                   >
-                    {' '}
-                    Continue to checkout
+                    Begin Checkout: Add Items to Your Cart{' '}
                   </Link>
                 </SheetTrigger>
-              </SheetFooter>
-            </div>
-          </>
-        ) : (
-          <div className="flex h-full flex-col items-center justify-center space-y-1">
-            <div
-              aria-hidden="true"
-              className="relative mb-4 h-60 w-60 text-muted-foreground"
-            >
-              <Image
-                src="/hippo-empty-cart.png"
-                fill
-                alt="empty shopping cart hippo"
-              />
-            </div>
-            <div className="text-xl font-semibold">Your cart is empty</div>
-            <SheetTrigger asChild>
-              <Link
-                href="/products"
-                className={buttonVariants({
-                  variant: 'link',
-                  size: 'sm',
-                  className: 'text-sm text-muted-foreground',
-                })}
-              >
-                Begin Checkout: Add Items to Your Cart{' '}
-              </Link>
-            </SheetTrigger>
+              </div>
+            )}
           </div>
-        )}
+        </ScrollArea>
       </SheetContent>
     </Sheet>
   );

@@ -24,3 +24,17 @@ export function formatPrice(
     maximumFractionDigits: 2,
   }).format(numericPrice)
 }
+
+// lib/utils.js
+
+export const calculateShippingCost = (distance) => {
+  const freeDistance = 5; // Distance in miles that is free
+  const chargePerMile = 0.50; // Charge per mile from the 6th mile onward
+
+  if (distance <= freeDistance) {
+    return 0; // Free delivery up to 5 miles
+  } else {
+    const extraMiles = distance - freeDistance;
+    return extraMiles * chargePerMile;
+  }
+};

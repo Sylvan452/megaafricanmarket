@@ -9,7 +9,8 @@ const perks = [
   {
     name: 'Instant Delivery',
     Icon: Truck,
-    description: 'Receive your Groceries swiftly delivered to your doorstep!',
+    description:
+      'Enjoy swift, free delivery of your groceries to your doorstep within a 5-mile radius. For distances beyond 5 miles, a fee of 50 cents per mile applies.',
   },
   {
     name: 'Guaranteed Quality',
@@ -18,10 +19,10 @@ const perks = [
       'Every product meets high standards for freshness, quality and taste. Your satisfaction is our priority.',
   },
   {
-    name: '100% Natural',
+    name: 'How to Shop',
     Icon: Leaf,
     description:
-      'Our products are pure and unadulterated, providing you with authentic and wholesome ingredients.',
+      'Browse through the collection on our website<br>Walk into our store during operational hours<br>Call or text our sales team to place an order',
   },
 ];
 export default function Home() {
@@ -97,6 +98,16 @@ export default function Home() {
             ))}
           </div>
         </MaxWidthWrapper>
+        <div>
+          <MaxWidthWrapper>
+            <hr className="my-8 border-gray-300" />
+            <ProductReel
+              query={{ sort: 'desc', limit: 8 }}
+              href="/products"
+              title="Our Products"
+            />
+          </MaxWidthWrapper>
+        </div>
       </section>
     </>
   );
