@@ -4,6 +4,7 @@ import { TQueryValidator } from '@/lib/validators/query-validator';
 import { Product } from '@/payload-types';
 import { trpc } from '@/trpc/client';
 import Link from 'next/link';
+import { useState } from 'react';
 import ProductListing from './ProductListing';
 
 interface ProductReelProps {
@@ -17,11 +18,13 @@ const FALLBACK_LIMIT = 8;
 
 const ProductReel = (props: ProductReelProps) => {
   const { title, subtitle, href, query } = props;
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { data: queryResults, isLoading } =
     trpc.getInfiniteProducts.useInfiniteQuery(
       {
         limit: query.limit ?? FALLBACK_LIMIT,
+        page: currentPage,
         query,
       },
       {
@@ -37,6 +40,16 @@ const ProductReel = (props: ProductReelProps) => {
   } else if (isLoading) {
     map = new Array<null>(query.limit ?? FALLBACK_LIMIT).fill(null);
   }
+
+  const handleNextPage = () => {
+    setCurrentPage((prevPage) => prevPage + 1);
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  };
 
   return (
     <section className="py-12">
@@ -74,6 +87,25 @@ const ProductReel = (props: ProductReelProps) => {
             ))}
           </div>
         </div>
+      </div>
+
+      <div className="mt-6 flex justify-between">
+        <button
+          onClick={handlePreviousPage}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <button
+          onClick={handleNextPage}
+          disabled={
+            products && products.length < (query.limit ?? FALLBACK_LIMIT)
+          }
+          className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </section>
   );

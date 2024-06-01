@@ -1,4 +1,5 @@
-// src/contexts/WishlistContext.tsx
+'use client';
+
 import { createContext, useContext, useState, ReactNode } from 'react';
 import { Product } from '@/payload-types';
 import { useEffect } from 'react';

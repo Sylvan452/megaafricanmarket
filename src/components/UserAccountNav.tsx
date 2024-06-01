@@ -11,6 +11,10 @@ import {
 } from './ui/dropdown-menu';
 import { useAuth } from '@/hooks/use-auth';
 
+interface UserAccountNavProps {
+  user: User | null;
+}
+
 const UserAccountNav = ({ user }: { user: User }) => {
   const { signOut } = useAuth();
 

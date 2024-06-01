@@ -6,12 +6,13 @@ import Navbar from '@/components/Navbar';
 import Providers from '@/components/Providers';
 import { Toaster } from 'sonner';
 import Footer from '@/components/Footer';
+import { WishlistProvider } from '@/contexts/WishlistContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Mega African Market',
-  description: 'Your tusted Grocery Shop',
+  description: 'Your trusted Grocery Shop',
 };
 
 export default function RootLayout({
@@ -26,9 +27,11 @@ export default function RootLayout({
       >
         <main className="relative flex flex-col min-h-screen">
           <Providers>
-            <Navbar />
-            <div className="flex-grow flex-1">{children}</div>
-            <Footer />
+            <WishlistProvider>
+              <Navbar />
+              <div className="flex-grow flex-1">{children}</div>
+              <Footer />
+            </WishlistProvider>
           </Providers>
         </main>
 

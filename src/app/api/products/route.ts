@@ -1,17 +1,27 @@
-// pages/api/products.ts
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Product } from '../../../payload-types';
-import { Products } from '../../../collections/Products/Products'; // Adjust the path as necessary
+import clientPromise from '../../../lib/mongodb'; // Adjust the path as necessary
 
-// Define the type for Products
 const fetchProducts = async (): Promise<Product[]> => {
-  // Replace this with actual database fetching logic if needed
-  return Products;
+  const client = await clientPromise;
+  const db = client.db(); // Add the database name if necessary
+  const products = await db.collection('products').find().toArray();
+
+  return products.map(product => ({
+    id: product._id.toString(), // Convert MongoDB ObjectId to string
+    name: product.name,
+    price: product.price,
+    category: product.category,
+    description: product.description,
+    imageUrl: product.imageUrl,
+    images: product.images || [], // Provide default value if not present
+    createdAt: product.createdAt || new Date().toISOString(), // Default to current date if not present
+    updatedAt: product.updatedAt || new Date().toISOString(), // Default to current date if not present
+  })) as Product[];
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { category, sort, query } = req.query;
+  const { category, sort, query, page = 1, limit = 8 } = req.query;
 
   let filteredProducts = await fetchProducts();
 
@@ -39,5 +49,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
   }
 
-  res.status(200).json({ products: filteredProducts });
+  const startIndex = (Number(page) - 1) * Number(limit);
+  const paginatedProducts = filteredProducts.slice(startIndex, startIndex + Number(limit));
+
+  res.status(200).json({ products: paginatedProducts });
 }

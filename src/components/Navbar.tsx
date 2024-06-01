@@ -3,23 +3,21 @@ import MaxWidthWrapper from './MaxWidthWrapper';
 import NavItems from './NavItems';
 import Image from 'next/image';
 import { buttonVariants } from './ui/button';
-import Cart from './Cart';
-import Wishlist from './Wishlist';
+import dynamic from 'next/dynamic';
 import { cookies } from 'next/headers';
 import { getServerSideUser } from '@/lib/payload.utils';
 import UserAccountNav from './UserAccountNav';
-import dynamic from 'next/dynamic';
-import MobileNav from './MobileNav';
+import Cart from './Cart';
+import Wishlist from './Wishlist';
 
 const SearchBar = dynamic(() => import('./SearchBar'), { ssr: false });
+const MobileNav = dynamic(() => import('./MobileNav'), { ssr: false });
 
-const Navbar = async ({
-  searchParams,
-}: {
-  searchParams?: {
-    query?: string;
-  };
-}) => {
+interface SearchParams {
+  query?: string;
+}
+
+const Navbar = async ({ searchParams }: { searchParams?: SearchParams }) => {
   const query = searchParams?.query || '';
   const nextCookies = cookies();
   const { user } = await getServerSideUser(nextCookies);
@@ -49,36 +47,35 @@ const Navbar = async ({
 
               <div className="ml-auto flex items-center">
                 <div className="hidden lg:flex lg:flex-1 space-x-4 lg:items-center lg:justify-end lg:space-x-6">
-                  {user ? null : (
-                    <Link
-                      href="/sign-in"
-                      className={buttonVariants({
-                        variant: 'ghost',
-                      })}
-                    >
-                      Sign in
-                    </Link>
-                  )}
-                  {user ? null : (
-                    <span className="h-6 w-px bg-gray-200" aria-hidden="true" />
-                  )}
-                  {user ? (
-                    <UserAccountNav user={user} />
+                  {!user ? (
+                    <>
+                      <Link
+                        href="/sign-in"
+                        className={buttonVariants({ variant: 'ghost' })}
+                      >
+                        Sign in
+                      </Link>
+                      <span
+                        className="h-6 w-px bg-gray-200"
+                        aria-hidden="true"
+                      />
+                      <Link
+                        href="/sign-up"
+                        className={buttonVariants({ variant: 'ghost' })}
+                      >
+                        Create Account
+                      </Link>
+                    </>
                   ) : (
-                    <Link
-                      href="/sign-up"
-                      className={buttonVariants({
-                        variant: 'ghost',
-                      })}
-                    >
-                      Create Account
-                    </Link>
+                    <UserAccountNav user={user} />
                   )}
                 </div>
-                <div className="hidden lg:flex">
-                  <Cart />
-                  <Wishlist />
-                </div>
+                {user && (
+                  <div className="hidden lg:flex space-x-4">
+                    <Cart />
+                    <Wishlist />
+                  </div>
+                )}
               </div>
             </div>
           </div>

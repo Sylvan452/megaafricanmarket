@@ -1,30 +1,42 @@
 import MaxWidthWrapper from '@/components/MaxWidthWrapper';
 import ProductReel from '@/components/ProductReel';
 import { buttonVariants } from '@/components/ui/button';
-import { CheckCircle, Leaf, Truck } from 'lucide-react';
+import { CheckCircle, ShoppingBag, Truck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { config, library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faTwitter,
+  faFacebook,
+  faInstagram,
+} from '@fortawesome/free-brands-svg-icons';
+import '@fortawesome/fontawesome-svg-core/styles.css';
+
+config.autoAddCss = false;
+
+library.add(faTwitter, faFacebook, faInstagram);
 
 const perks = [
   {
     name: 'Instant Delivery',
     Icon: Truck,
     description:
-      'Enjoy swift, free delivery of your groceries to your doorstep within a 5-mile radius. For distances beyond 5 miles, a fee of 50 cents per mile applies.',
+      'Enjoy free delivery to your doorstep within 5-mile.<br />For distances beyond 5 miles, a fee of 50 cents per mile applies.',
   },
   {
     name: 'Guaranteed Quality',
     Icon: CheckCircle,
     description:
-      'Every product meets high standards for freshness, quality and taste. Your satisfaction is our priority.',
+      'Every product meets high standards for freshness, quality, and taste.<br />Your satisfaction is our priority.',
   },
   {
     name: 'How to Shop',
-    Icon: Leaf,
+    Icon: ShoppingBag,
     description:
-      'Browse through the collection on our website<br>Walk into our store during operational hours<br>Call or text our sales team to place an order',
+      'Browse through the collection on our website.<br />Walk into our store during operational hours.<br />Call or text our sales team to place an order.',
   },
 ];
+
 export default function Home() {
   return (
     <>
@@ -90,9 +102,10 @@ export default function Home() {
                   <h3 className="text-base font-medium text-gray-900">
                     {perk.name}
                   </h3>
-                  <p className="mt-3 text-sm text-muted-foreground">
-                    {perk.description}
-                  </p>
+                  <p
+                    className="mt-3 text-sm text-muted-foreground"
+                    dangerouslySetInnerHTML={{ __html: perk.description }}
+                  />
                 </div>
               </div>
             ))}
@@ -103,8 +116,8 @@ export default function Home() {
             <hr className="my-8 border-gray-300" />
             <ProductReel
               query={{ sort: 'desc', limit: 8 }}
-              href="/products"
-              title="Our Products"
+              href="/product"
+              title="Best Brands"
             />
           </MaxWidthWrapper>
         </div>

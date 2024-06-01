@@ -27,7 +27,7 @@ export function formatPrice(
 
 // lib/utils.js
 
-export const calculateShippingCost = (distance) => {
+export const calculateShippingCost = (distance: number): number => {
   const freeDistance = 5; // Distance in miles that is free
   const chargePerMile = 0.50; // Charge per mile from the 6th mile onward
 

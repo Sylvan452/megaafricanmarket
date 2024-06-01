@@ -24,15 +24,17 @@ const Footer = () => {
 
         <div className="py-10 md:flex md:items-center md:justify-between">
           <div className="flex items-center space-x-4 md:space-x-8 md:flex-col md:items-start">
-            <a href="#" className="text-gray-600 hover:text-gray-800">
-              <FontAwesomeIcon icon={faTwitter} />
-            </a>
-            <a href="#" className="text-gray-600 hover:text-gray-800">
-              <FontAwesomeIcon icon={faFacebook} />
-            </a>
-            <a href="#" className="text-gray-600 hover:text-gray-800">
-              <FontAwesomeIcon icon={faInstagram} />
-            </a>
+            <span className="flex flex-col items-center gap-3">
+              <a href="#" className="text-gray-600 hover:text-gray-800 ">
+                <FontAwesomeIcon icon={faTwitter} />
+              </a>
+              <a href="#" className="text-gray-600 hover:text-gray-800">
+                <FontAwesomeIcon icon={faFacebook} />
+              </a>
+              <a href="#" className="text-gray-600 hover:text-gray-800">
+                <FontAwesomeIcon icon={faInstagram} />
+              </a>
+            </span>
           </div>
           <div>
             <div className="font-semibold text-gray-700 uppercase mt-8 md:mt-0">
@@ -41,7 +43,10 @@ const Footer = () => {
             <div className="mt-2 md:mt-4">
               <ul>
                 <li>
-                  <a href="#" className="text-gray-600 hover:text-gray-800">
+                  <a
+                    href="/terms"
+                    className="text-gray-600 hover:text-gray-800"
+                  >
                     Terms
                   </a>
                 </li>

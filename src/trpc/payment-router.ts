@@ -7,10 +7,10 @@ import type Stripe from 'stripe';
 
 export const paymentRouter = router({
   createSession: privateProcedure
-    .input(z.object({ productIds: z.array(z.string()), totalAmount: z.number() })) // Added totalAmount here
+    .input(z.object({ productIds: z.array(z.string()), totalAmount: z.number(), needsShipping: z.boolean() })) 
     .mutation(async ({ ctx, input }) => {
       const { user } = ctx;
-      const { productIds, totalAmount } = input; // Destructure totalAmount from input
+      const { productIds, totalAmount, needsShipping } = input; 
 
       if (productIds.length === 0) {
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'No product IDs provided' });
@@ -45,7 +45,7 @@ export const paymentRouter = router({
             user: user.id,
             orderedBy: user.id,
             price_SHIPPING: '',
-            totalAmount, // Store the total amount in the order
+            totalAmount,
           },
         });
 
@@ -58,20 +58,39 @@ export const paymentRouter = router({
           },
         }));
 
-        const includeShipping = process.env.INCLUDE_SHIPPING === 'true'; // Optional configuration
-        if (includeShipping) {
+        if (needsShipping) {
           const shippingPriceId = process.env.SHIPPING_PRICE_ID;
-          if (!shippingPriceId) {
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Shipping price ID not set in environment' });
+          if (shippingPriceId) {
+            try {
+              // Validate the shipping price ID
+              await stripe.prices.retrieve(shippingPriceId);
+              line_items.push({
+                price: shippingPriceId,
+                quantity: 1,
+                adjustable_quantity: {
+                  enabled: false,
+                },
+              });
+            } catch (error) {
+              console.warn(`Invalid shipping price ID: ${shippingPriceId}. Skipping shipping fee.`);
+            }
+          } else {
+            console.warn('Shipping price ID not set in environment; skipping shipping fee.');
           }
-          line_items.push({
-            price: shippingPriceId,
-            quantity: 1,
-            adjustable_quantity: {
-              enabled: false,
-            },
-          });
         }
+
+        // Add transaction fee to line items
+        const transactionFeePriceId = process.env.TRANSACTION_FEE_ID;
+        if (!transactionFeePriceId) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Transaction fee price ID not set in environment' });
+        }
+        line_items.push({
+          price: transactionFeePriceId,
+          quantity: 1,
+          adjustable_quantity: {
+            enabled: false,
+          },
+        });
 
         // Create Stripe checkout session
         const stripeSession = await stripe.checkout.sessions.create({

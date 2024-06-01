@@ -29,7 +29,7 @@ export const appRouter = router({
 
     Object.entries(queryOpts).forEach(([key, value]) => {
       parsedQueryOpts[key] = {
-        equals: value,
+        equals: String(value),
       }
     })
     const page = cursor || 1

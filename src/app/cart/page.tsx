@@ -9,7 +9,7 @@ import { Check, Loader2, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import IncrementQuantity from '@/components/IncrementQuantity';
 import CartItem from '@/components/CartItem'; // Make sure to import CartItem
 
@@ -27,28 +27,31 @@ const Page = () => {
   const productIds = items.map(({ product }) => product.id);
 
   const [isMounted, setIsMounted] = useState<boolean>(false);
-  useEffect(() => {
-    setIsMounted(true);
-    recalculateTotal();
-  }, [items]);
-
   const [cartTotal, setCartTotal] = useState<number>(0);
+  const [isSheetOpen, setIsSheetOpen] = useState<boolean>(false);
 
-  const recalculateTotal = () => {
+  const recalculateTotal = useCallback(() => {
     const total = items.reduce(
       (sum, { product, quantity }) => sum + product.price * quantity,
       0,
     );
     setCartTotal(total);
-  };
+  }, [items]);
+
+  useEffect(() => {
+    setIsMounted(true);
+    recalculateTotal();
+  }, [items, recalculateTotal]);
 
   const handleQuantityChange = (productId: string, quantity: number) => {
     updateItemQuantity(productId, quantity);
     recalculateTotal();
   };
 
-  const fee = 1;
-  const deliveryfee = 2;
+  const transationfeeString = process.env.TRANSATION_FEE || '1';
+  const fee = parseFloat(transationfeeString);
+  const deliveryfeeString = process.env.SHIPPING_PRICE_ID || '0';
+  const deliveryfee = parseFloat(deliveryfeeString);
 
   const calculateTotalAmount = (): number => {
     return cartTotal + fee + deliveryfee;
@@ -56,7 +59,11 @@ const Page = () => {
 
   const handleCheckout = () => {
     const totalAmount = calculateTotalAmount();
-    createCheckoutSession({ productIds, totalAmount });
+    createCheckoutSession({
+      productIds,
+      totalAmount,
+      needsShipping: false,
+    });
   };
 
   return (

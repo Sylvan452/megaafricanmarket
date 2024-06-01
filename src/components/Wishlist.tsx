@@ -11,7 +11,6 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetFooter,
 } from './ui/sheet';
 import { formatPrice } from '@/lib/utils';
 import { useWishlist } from '@/contexts/WishlistContext';
@@ -28,13 +27,18 @@ const Wishlist = () => {
 
   useEffect(() => {
     setIsMounted(true);
-    recalculateTotal();
-  }, [wishlist]);
+  }, []);
 
-  const recalculateTotal = () => {
-    const total = wishlist.reduce((sum, product) => sum + product.price, 0);
-    setTotalPrice(total);
-  };
+  useEffect(() => {
+    if (isMounted) {
+      const recalculateTotal = () => {
+        const total = wishlist.reduce((sum, product) => sum + product.price, 0);
+        setTotalPrice(total);
+      };
+
+      recalculateTotal();
+    }
+  }, [wishlist, isMounted]);
 
   const closeSheet = () => setIsSheetOpen(false);
 
@@ -62,7 +66,7 @@ const Wishlist = () => {
                     product={product}
                     key={product.id}
                     onRemove={() => removeFromWishlist(product.id)}
-                    onClose={closeSheet} // Pass the closeSheet function to WishlistItem
+                    onClose={closeSheet} 
                   />
                 ))}
               </ScrollArea>

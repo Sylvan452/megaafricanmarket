@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -13,12 +13,11 @@ import {
   SheetTitle,
   SheetFooter,
 } from './ui/sheet';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, calculateShippingCost } from '@/lib/utils';
 import { buttonVariants } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
 import { useCart } from '@/hooks/use-cart';
 import CartItem from './CartItem';
-import { calculateShippingCost } from '@/lib/utils';
 
 const Cart = () => {
   const { items } = useCart();
@@ -30,7 +29,6 @@ const Cart = () => {
   const [distance, setDistance] = useState(0);
   const [deliveryFee, setDeliveryFee] = useState(0);
 
-  // Additional state for shipping details
   const [shippingDetails, setShippingDetails] = useState({
     country: 'US',
     firstName: '',
@@ -42,19 +40,19 @@ const Cart = () => {
     phone: '',
   });
 
-  useEffect(() => {
-    setIsMounted(true);
-    recalculateTotal();
-  }, [items, deliveryMethod, distance]);
-
-  const recalculateTotal = () => {
+  const recalculateTotal = useCallback(() => {
     const total = items.reduce(
       (sum, { product, quantity }) => sum + product.price * quantity,
       0,
     );
     setTotalPrice(total);
     setDeliveryFee(calculateShippingCost(distance));
-  };
+  }, [items, distance]);
+
+  useEffect(() => {
+    setIsMounted(true);
+    recalculateTotal();
+  }, [items, deliveryMethod, distance, recalculateTotal]);
 
   const handleQuantityChange = (productId: string, quantity: number) => {
     const item = items.find((item) => item.product.id === productId);
@@ -306,7 +304,7 @@ const Cart = () => {
                       className: 'text-sm text-muted-foreground',
                     })}
                   >
-                    Begin Checkout: Add Items to Your Cart{' '}
+                    Begin Checkout: Add Items to Your Cart
                   </Link>
                 </SheetTrigger>
               </div>
