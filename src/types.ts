@@ -5,6 +5,7 @@ export interface Product {
     name: string;
     category: string;
     // Add other fields as needed
+    ranking: number;
   }
   
   export interface SignInResponse {

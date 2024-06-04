@@ -1,3 +1,5 @@
+// 'use client';
+
 import Link from 'next/link';
 import MaxWidthWrapper from './MaxWidthWrapper';
 import NavItems from './NavItems';
@@ -21,6 +23,7 @@ const Navbar = async ({ searchParams }: { searchParams?: SearchParams }) => {
   const query = searchParams?.query || '';
   const nextCookies = cookies();
   const { user } = await getServerSideUser(nextCookies);
+  console.log('\n\nnext cooks, user', nextCookies, '\n\n user', user);
 
   return (
     <div className="bg-white sticky z-50 top-0 justify-between inset-x-0 h-16">

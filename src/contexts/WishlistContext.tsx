@@ -22,15 +22,22 @@ export const useWishlist = (): WishlistContextType => {
   return context;
 };
 
-export const WishlistProvider = ({ children }: { children: ReactNode }) => {
-  // Load wishlist from localStorage on component mount
+export default function WishlistProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  // Load wishlist from window?.localStorage on component mount
   const [wishlist, setWishlist] = useState<Product[]>(() => {
+    if (typeof localStorage === 'undefined') return [];
+
     const storedWishlist = localStorage.getItem('wishlist');
     return storedWishlist ? JSON.parse(storedWishlist) : [];
   });
 
-  // Save wishlist to localStorage whenever it changes
+  // Save wishlist to window?.localStorage whenever it changes
   useEffect(() => {
+    if (typeof localStorage === 'undefined') return;
     localStorage.setItem('wishlist', JSON.stringify(wishlist));
   }, [wishlist]);
 
@@ -49,4 +56,4 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </WishlistContext.Provider>
   );
-};
+}

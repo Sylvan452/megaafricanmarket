@@ -51,12 +51,18 @@ const Footer = () => {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="text-gray-600 hover:text-gray-800">
+                  <a
+                    href="/privacy-policy"
+                    className="text-gray-600 hover:text-gray-800"
+                  >
                     Privacy Policy
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="text-gray-600 hover:text-gray-800">
+                  <a
+                    href="/cookie-policy"
+                    className="text-gray-600 hover:text-gray-800"
+                  >
                     Cookie Policy
                   </a>
                 </li>
@@ -69,17 +75,26 @@ const Footer = () => {
             </div>
             <ul className="mt-2 md:mt-4">
               <li>
-                <a href="#" className="text-gray-600 hover:text-gray-800">
+                <a
+                  href="/about-us"
+                  className="text-gray-600 hover:text-gray-800"
+                >
                   About us
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-gray-800">
+                <a
+                  href="/contact-us"
+                  className="text-gray-600 hover:text-gray-800"
+                >
                   Contact us
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-gray-800">
+                <a
+                  href="/testimonials"
+                  className="text-gray-600 hover:text-gray-800"
+                >
                   Testimonials
                 </a>
               </li>

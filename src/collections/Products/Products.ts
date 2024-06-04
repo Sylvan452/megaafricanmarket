@@ -14,20 +14,28 @@ export const PRODUCT_CATEGORIES = [
     value: 'fresh_produce',
   },
   {
-    label: 'Meat and Poultry',
-    value: 'meat_poultry',
+    label: 'Meat/Chicken/Fish',
+    value: 'meat_chicken_fish',
   },
   {
-    label: "Kellogg's",
-    value: 'kelloggs',
+    label: "Frozen Food/Vegetable",
+    value: 'frozen_food_vegetable',
   },
   {
-    label: 'Nestlé',
-    value: 'nestle',
+    label: 'Canned Products',
+    value: 'canned_products',
   },
   {
-    label: 'Coca-Cola',
-    value: 'coca_cola',
+    label: 'Spices',
+    value: 'spices',
+  },
+  {
+    label: 'Spices',
+    value: 'spices',
+  },
+  {
+    label: 'Spices',
+    value: 'spices',
   },
 ];
 

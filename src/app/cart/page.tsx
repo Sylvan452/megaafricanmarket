@@ -24,7 +24,10 @@ const Page = () => {
       },
     });
 
-  const productIds = items.map(({ product }) => product.id);
+  // const purchases = items.map(({ product, quantity }) => ({
+  //   productId: product.id,
+  //   quantity,
+  // }));
 
   const [isMounted, setIsMounted] = useState<boolean>(false);
   const [cartTotal, setCartTotal] = useState<number>(0);
@@ -58,12 +61,21 @@ const Page = () => {
   };
 
   const handleCheckout = () => {
+    console.log('handling');
     const totalAmount = calculateTotalAmount();
+    console.log('items', items);
     createCheckoutSession({
-      productIds,
+      items: items.map((item) => {
+        // (item as any).product = item.product.id;
+        return {
+          ...item,
+          product: item.product.id,
+        } as any as { product: string; quantity: number };
+      }),
       totalAmount,
       needsShipping: false,
     });
+    console.log('sent');
   };
 
   return (
@@ -116,7 +128,7 @@ const Page = () => {
                     href.includes(product.category),
                   )?.name;
 
-                  const { image } = product.images[0];
+                  // const { image } = product?.images?.[0];
 
                   return (
                     <CartItem

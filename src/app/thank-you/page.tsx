@@ -8,6 +8,7 @@ import { PRODUCT_CATEGORIES } from '@/config';
 import { formatPrice } from '@/lib/utils';
 import Link from 'next/link';
 import PaymentStatus from '@/components/PaymentStatus';
+import { useEffect } from 'react';
 
 interface PageProps {
   searchParams: {
@@ -22,6 +23,8 @@ const ThankYouPage = async ({ searchParams }: PageProps) => {
   const { user } = await getServerSideUser(nextCookies);
   const payload = await getPayloadClient();
 
+  console.log('\n\nlogged', orderId, user?.id);
+
   const { docs: orders } = await payload.find({
     collection: 'orders',
     depth: 2,
@@ -34,16 +37,18 @@ const ThankYouPage = async ({ searchParams }: PageProps) => {
 
   const [order] = orders;
 
+  // useEffect(() => {}, []);
+
   if (!order) return notFound();
 
   const orderUserId =
-    typeof order.user === 'string' ? order.user : order.user?.id; // Add optional chaining
-
+    typeof order.orderedBy === 'string' ? order.orderedBy : order.orderedBy?.id; // Add optional chaining
+  console.log('\n\nlogged', order, orderId, orderUserId, user?.id);
   if (!orderUserId || orderUserId !== user?.id) {
     return redirect(`/sign-in?origin=thank-you&orderId=${order.id}`);
   }
 
-  const products = order.products as Product[];
+  const products = order.items.map(({ product }) => product) as Product[];
 
   const orderTotal = products.reduce((total, product) => {
     return total + product.price;
@@ -69,9 +74,9 @@ const ThankYouPage = async ({ searchParams }: PageProps) => {
             <p className="mt-2 text-base text-muted-foreground">
               Your order was successful. We&apos;ll ship if that was your
               selected option or you can pick up{' '}
-              {order.user && typeof order.user !== 'string' ? (
+              {order.orderedBy && typeof order.orderedBy !== 'string' ? (
                 <span className="font-medium text-gray-900">
-                  {order.user.email}
+                  {order.orderedBy.email}
                 </span>
               ) : null}
               .
@@ -147,8 +152,10 @@ const ThankYouPage = async ({ searchParams }: PageProps) => {
             </div>
 
             <PaymentStatus
-              isPaid={order._isPaid}
-              orderEmail={order.user ? (order.user as User).email : ''}
+              isPaid={!!order._isPaid}
+              orderEmail={
+                order.orderedBy ? (order.orderedBy as User).email : ''
+              }
               orderId={order.id}
             />
 

@@ -25,16 +25,16 @@ interface ReceiptEmailProps {
   email: string;
   date: Date;
   orderId: string;
-  products: Product[];
+  items: { product: Product; quantity?: number }[];
 }
 
 export const ReceiptEmail = ({
   email,
   date,
   orderId,
-  products,
+  items,
 }: ReceiptEmailProps) => {
-  const total = products.reduce((acc, curr) => acc + curr.price, 0) + 1;
+  const total = items.reduce((acc, curr) => acc + curr.product.price, 0) + 1;
 
   return (
     <Html>
@@ -92,7 +92,7 @@ export const ReceiptEmail = ({
           <Section style={productTitleTable}>
             <Text style={productsTitle}>Order Summary</Text>
           </Section>
-          {products.map((product) => {
+          {items.map(({ product }) => {
             const { image } = product.images[0];
 
             return (

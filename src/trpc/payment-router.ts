@@ -4,17 +4,38 @@ import { TRPCError } from '@trpc/server';
 import { getPayloadClient } from '../get-payload';
 import { stripe } from '../lib/stripe';
 import type Stripe from 'stripe';
+import { Product } from '@/payload-types';
 
 export const paymentRouter = router({
   createSession: privateProcedure
-    .input(z.object({ productIds: z.array(z.string()), totalAmount: z.number(), needsShipping: z.boolean() })) 
+    .input(
+      z.object({
+        items: z.array(
+          z.object({
+            product: z.string(),
+            // product: z.object({}).required(),
+            quantity: z.number().optional(),
+          }),
+        ),
+        //
+        totalAmount: z.number(),
+        needsShipping: z.boolean(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
+      console.log('\n\nstarted');
       const { user } = ctx;
-      const { productIds, totalAmount, needsShipping } = input; 
+      const { items, totalAmount, needsShipping } = input;
+      console.log('\n\nstarted2');
 
-      if (productIds.length === 0) {
-        throw new TRPCError({ code: 'BAD_REQUEST', message: 'No product IDs provided' });
+      if (items.length === 0) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'No items provided',
+        });
       }
+
+      console.log('\n\nstarted3');
 
       const payload = await getPayloadClient();
 
@@ -23,40 +44,73 @@ export const paymentRouter = router({
         const { docs: products } = await payload.find({
           collection: 'products',
           where: {
-            id: { in: productIds },
+            id: { in: items.map(({ product }) => product) },
           },
         });
 
         if (!products.length) {
-          throw new TRPCError({ code: 'NOT_FOUND', message: 'No products found for provided IDs' });
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'No products found for provided IDs',
+          });
         }
 
-        const filteredProducts = products.filter((prod) => prod.priceId && typeof prod.priceId === 'string');
+        const filteredProducts = products.filter(
+          (prod) => prod.priceId && typeof prod.priceId === 'string',
+        );
         if (filteredProducts.length === 0) {
-          throw new TRPCError({ code: 'BAD_REQUEST', message: 'None of the products have a valid priceId' });
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'None of the products have a valid priceId',
+          });
         }
 
         // Create order with user ID, product IDs, and total amount
+        console.log('\n\nfiltered producst', filteredProducts);
+        const filterdProductsMap: Record<string, Product> = {};
+
+        const filteredProductsIdsSet = new Set(
+          filteredProducts.map((p) => {
+            filterdProductsMap[p.id] = p;
+            return p.id;
+          }),
+        );
+        const filteredItems = items.filter((item) =>
+          filteredProductsIdsSet.has(item.product),
+        );
         const order = await payload.create({
           collection: 'orders',
           data: {
             _isPaid: false,
-            products: filteredProducts.map((prod) => prod.id),
-            user: user.id,
+            items: filteredItems,
+            //  filteredProducts.map((prod) => prod.id),
+            // user: user.id,
             orderedBy: user.id,
-            price_SHIPPING: '',
+            // price_SHIPPING: '',
+            //
             totalAmount,
           },
         });
 
         // Construct line items for Stripe checkout
-        const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = filteredProducts.map((product) => ({
-          price: product.priceId as string,
-          quantity: 1,
-          adjustable_quantity: {
-            enabled: true,
-          },
-        }));
+        const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] =
+          filteredItems.map(({ product, quantity }) => {
+            return {
+              price: filterdProductsMap[product].priceId as string,
+              quantity,
+              adjustable_quantity: {
+                enabled: true,
+              },
+            };
+          });
+
+        // filteredProducts.map((product) => ({
+        //   price: product.priceId as string,
+        //   quantity: 1,
+        //   adjustable_quantity: {
+        //     enabled: true,
+        //   },
+        // }));
 
         if (needsShipping) {
           const shippingPriceId = process.env.SHIPPING_PRICE_ID;
@@ -72,17 +126,24 @@ export const paymentRouter = router({
                 },
               });
             } catch (error) {
-              console.warn(`Invalid shipping price ID: ${shippingPriceId}. Skipping shipping fee.`);
+              console.warn(
+                `Invalid shipping price ID: ${shippingPriceId}. Skipping shipping fee.`,
+              );
             }
           } else {
-            console.warn('Shipping price ID not set in environment; skipping shipping fee.');
+            console.warn(
+              'Shipping price ID not set in environment; skipping shipping fee.',
+            );
           }
         }
 
         // Add transaction fee to line items
         const transactionFeePriceId = process.env.TRANSACTION_FEE_ID;
         if (!transactionFeePriceId) {
-          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Transaction fee price ID not set in environment' });
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Transaction fee price ID not set in environment',
+          });
         }
         line_items.push({
           price: transactionFeePriceId,
@@ -111,9 +172,16 @@ export const paymentRouter = router({
         if (err instanceof TRPCError) {
           throw err; // Re-throw TRPCErrors to preserve their details
         } else if (err instanceof Error) {
-          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: `Failed to create payment session: ${err.message}`, cause: err });
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: `Failed to create payment session: ${err.message}`,
+            cause: err,
+          });
         } else {
-          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to create payment session' });
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to create payment session',
+          });
         }
       }
     }),

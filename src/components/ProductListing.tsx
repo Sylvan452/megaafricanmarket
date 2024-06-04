@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { Skeleton } from './ui/skeleton';
 import { cn, formatPrice } from '@/lib/utils';

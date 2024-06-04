@@ -5,7 +5,7 @@ import { PropsWithChildren } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { httpBatchLink } from '@trpc/client';
 import { trpc } from '@/trpc/client';
-import { WishlistProvider } from '@/contexts/WishlistContext';
+import WishlistProvider from '@/contexts/WishlistContext';
 import { SessionProvider } from 'next-auth/react';
 
 const Providers = ({ children }: PropsWithChildren) => {

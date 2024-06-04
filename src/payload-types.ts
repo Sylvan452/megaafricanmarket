@@ -48,7 +48,7 @@ export interface Product {
   name: string;
   description?: string | null;
   price: number;
-  category: 'seafood' | 'fresh_produce' | 'meat_poultry' | 'kelloggs' | 'nestle' | 'coca_cola';
+  category: 'seafood' | 'fresh_produce' | 'meat_chicken_fish' | 'frozen_food_vegetable' | 'canned_products' | 'spices';
   brandCategory?: ('kellogg_s' | 'nestl_' | 'coca_cola') | null;
   priceId?: string | null;
   stripeId?: string | null;
@@ -109,14 +109,16 @@ export interface Media {
  */
 export interface Order {
   id: string;
-  _isPaid: boolean;
-  user: string | User;
-  products: (string | Product)[];
   orderedBy: string | User;
+  items: {
+    product: string | Product;
+    quantity?: number | null;
+    id?: string | null;
+  }[];
+  _isPaid?: boolean | null;
+  totalAmount: number;
   createdAt: string;
   updatedAt: string;
-  price_SHIPPING: string;
-  totalAmount: number;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -18,8 +18,10 @@ const CartItem: React.FC<CartItemProps> = ({
   initialQuantity,
   onQuantityChange,
 }) => {
-  const { image } = product.images[0];
   const { removeItem } = useCart();
+  // console.log('\n\nproduct', product);
+  if (!product) return;
+  const { image } = (product?.images?.length && product?.images?.[0]) || {};
 
   const categoryName = PRODUCT_CATEGORIES.find(
     ({ value }) => value === 'Categories',
@@ -34,7 +36,7 @@ const CartItem: React.FC<CartItemProps> = ({
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center space-x-4">
           <div className="relative aspect-square h-16 w-16 min-w-fit overflow-hidden rounded">
-            {typeof image !== 'string' && image.url ? (
+            {typeof image !== 'string' && image?.url ? (
               <Image
                 src={image.url}
                 alt={product.name}

@@ -14,11 +14,33 @@ const Orders: CollectionConfig = {
       required: true,
     },
     {
+      name: 'items',
+      type: 'array',
+      required: true,
+      fields: [
+        {
+          name: 'product',
+          type: 'relationship',
+          relationTo: 'products',
+          required: true,
+        },
+        {
+          name: 'quantity',
+          type: 'number',
+        },
+      ],
+    },
+    {
       name: '_isPaid',
       type: 'checkbox',
       access: {
         read: ({ req }) => req.user.role === 'admin',
-      }
+      },
+    },
+    {
+      name: 'totalAmount',
+      type: 'number',
+      required: true,
     },
     {
       name: 'createdAt',
