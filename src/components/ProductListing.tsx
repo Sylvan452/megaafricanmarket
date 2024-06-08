@@ -8,16 +8,20 @@ import ImageSlider from './ImageSlider';
 import { HeartIcon } from 'lucide-react';
 import { useWishlist } from '@/contexts/WishlistContext';
 import Link from 'next/link';
-import Image from 'next/image';
-import image from 'next/image';
 import { Product } from '@/payload-types';
+import AddToCartButton from './AddToCartButton';
 
 interface ProductListingProps {
   product: Product | null;
   index: number;
+  isLoggedIn: boolean;
 }
 
-const ProductListing = ({ product, index }: ProductListingProps) => {
+const ProductListing = ({
+  product,
+  index,
+  isLoggedIn,
+}: ProductListingProps) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const isWishlisted = product?.id
@@ -78,6 +82,7 @@ const ProductListing = ({ product, index }: ProductListingProps) => {
           <p className="mt-1 font-medium text-sm text-gray-900">
             {formatPrice(product?.price || 0)}
           </p>
+          {isLoggedIn && product && <AddToCartButton product={product} />}
         </div>
       </Link>
     </div>

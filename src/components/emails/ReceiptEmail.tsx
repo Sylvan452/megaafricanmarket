@@ -117,11 +117,6 @@ export const ReceiptEmail = ({
                         : product.description}
                     </Text>
                   ) : null}
-                  <Link
-                    href={`${process.env.NEXT_PUBLIC_SERVER_URL}/thank-you?orderId=${orderId}`}
-                  >
-                    Download Asset
-                  </Link>
                 </Column>
 
                 <Column style={productPriceWrapper} align="right">

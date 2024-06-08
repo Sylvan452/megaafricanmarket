@@ -11,6 +11,7 @@ import {
   faInstagram,
 } from '@fortawesome/free-brands-svg-icons';
 import '@fortawesome/fontawesome-svg-core/styles.css';
+import { useSearchParams } from 'next/navigation';
 
 config.autoAddCss = false;
 
@@ -37,91 +38,154 @@ const perks = [
   },
 ];
 
-export default function Home() {
+export default function Home({
+  // params,
+  searchParams: { query = '' },
+}: {
+  searchParams: { query?: string };
+}) {
+  // const searchParams = useSearchParams();
+  // console.log('searchParams', query);
+
+  // if (!query)
   return (
     <>
-      <MaxWidthWrapper>
-        <div className="flex flex-col md:flex-row">
-          <div className="md:w-1/2 py-20 mx-auto text-center flex flex-col items-center max-w-3xl md:pr-12">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-800 sm:text-5xl">
-              Explore Your Ultimate One-Stop Shop for Quality{' '}
-              <span style={{ display: 'inline' }} className="text-green-700">
-                African
-              </span>{' '}
-              &{' '}
-              <span style={{ display: 'inline' }} className="text-red-600">
-                Caribbean
-              </span>{' '}
-              Groceries!
-            </h1>
+      {query ? (
+        <section className="border-t border-gray-200 bg-gray-50">
+          {/* <MaxWidthWrapper className="py-20">
+            <div className="grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-0">
+              {perks.map((perk) => (
+                <div
+                  key={perk.name}
+                  className="text-center md:flex md:items-start md:text-left lg:block lg:text-center"
+                >
+                  <div className="md:flex-shrink-0 flex justify-center">
+                    <div className="h-16 w-16 flex items-center justify-center rounded-full bg-green-100 text-green-900">
+                      {<perk.Icon className="w-1/3 h-1/3" />}
+                    </div>
+                  </div>
 
-            <p className="mt-6 text-lg max-w-prose text-muted-foreground">
-              Welcome to{' '}
-              <span className="text-red-600 text-xl">Mega African Market:</span>{' '}
-              We Offer High-Quality and Fresh Ingredients for African &
-              Caribbean Cuisine
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 mt-6">
-              <Link href="/product" className={buttonVariants()}>
-                Shop Now
-              </Link>
-            </div>
-          </div>
-          <div className="md:w-1/2 flex justify-center items-center">
-            <Image
-              src="/hero.png"
-              alt="hero"
-              width={500}
-              height={500}
-              className="object-contain"
-            />
-          </div>
-        </div>
-        <hr className="my-8 border-gray-300" />
-        <ProductReel
-          query={{ sort: 'desc', limit: 8 }}
-          href="/products"
-          title="Our Products"
-        />
-      </MaxWidthWrapper>
-      <section className="border-t border-gray-200 bg-gray-50">
-        <MaxWidthWrapper className="py-20">
-          <div className="grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-0">
-            {perks.map((perk) => (
-              <div
-                key={perk.name}
-                className="text-center md:flex md:items-start md:text-left lg:block lg:text-center"
-              >
-                <div className="md:flex-shrink-0 flex justify-center">
-                  <div className="h-16 w-16 flex items-center justify-center rounded-full bg-green-100 text-green-900">
-                    {<perk.Icon className="w-1/3 h-1/3" />}
+                  <div className="mt-6 md:ml-4 md:mt-0 lg:ml-0 lg:mt-6">
+                    <h3 className="text-base font-medium text-gray-900">
+                      {perk.name}
+                    </h3>
+                    <p
+                      className="mt-3 text-sm text-muted-foreground"
+                      dangerouslySetInnerHTML={{ __html: perk.description }}
+                    />
                   </div>
                 </div>
+              ))}
+            </div>
+          </MaxWidthWrapper> */}
+          <div>
+            <MaxWidthWrapper>
+              {/* <hr className="my-8 border-gray-300" /> */}
+              <ProductReel
+                query={{
+                  sort: 'desc',
+                  // limit: 8,
+                  name: query,
+                  category: query,
+                  brand: query,
+                }}
+                isSearch={true}
+                title="Search Results"
+              />
+            </MaxWidthWrapper>
+          </div>
+        </section>
+      ) : (
+        <>
+          <MaxWidthWrapper>
+            <div className="flex flex-col md:flex-row">
+              <div className="md:w-1/2 py-20 mx-auto text-center flex flex-col items-center max-w-3xl md:pr-12">
+                <h1 className="text-4xl font-bold tracking-tight text-gray-800 sm:text-5xl">
+                  Explore Your Ultimate One-Stop Shop for Quality{' '}
+                  <span
+                    style={{ display: 'inline' }}
+                    className="text-green-700"
+                  >
+                    African
+                  </span>{' '}
+                  &{' '}
+                  <span style={{ display: 'inline' }} className="text-red-600">
+                    Caribbean
+                  </span>{' '}
+                  Groceries!
+                </h1>
 
-                <div className="mt-6 md:ml-4 md:mt-0 lg:ml-0 lg:mt-6">
-                  <h3 className="text-base font-medium text-gray-900">
-                    {perk.name}
-                  </h3>
-                  <p
-                    className="mt-3 text-sm text-muted-foreground"
-                    dangerouslySetInnerHTML={{ __html: perk.description }}
-                  />
+                <p className="mt-6 text-lg max-w-prose text-muted-foreground">
+                  Welcome to{' '}
+                  <span className="text-red-600 text-xl">
+                    Mega African Market:
+                  </span>{' '}
+                  We Offer High-Quality and Fresh Ingredients for African &
+                  Caribbean Cuisine
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 mt-6">
+                  <Link href="/product" className={buttonVariants()}>
+                    Shop Now
+                  </Link>
                 </div>
               </div>
-            ))}
-          </div>
-        </MaxWidthWrapper>
-        <div>
-          <MaxWidthWrapper>
+              <div className="md:w-1/2 flex justify-center items-center">
+                <Image
+                  src="/hero.png"
+                  alt="hero"
+                  width={500}
+                  height={500}
+                  className="object-contain"
+                />
+              </div>
+            </div>
             <hr className="my-8 border-gray-300" />
             <ProductReel
               query={{ sort: 'desc', limit: 8 }}
-              href="/product"
-              title="Best Brands"
+              href="/products"
+              title="Our Products"
             />
           </MaxWidthWrapper>
-        </div>
-      </section>
+          <section className="border-t border-gray-200 bg-gray-50">
+            <MaxWidthWrapper className="py-20">
+              <div className="grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-0">
+                {perks.map((perk) => (
+                  <div
+                    key={perk.name}
+                    className="text-center md:flex md:items-start md:text-left lg:block lg:text-center"
+                  >
+                    <div className="md:flex-shrink-0 flex justify-center">
+                      <div className="h-16 w-16 flex items-center justify-center rounded-full bg-green-100 text-green-900">
+                        {<perk.Icon className="w-1/3 h-1/3" />}
+                      </div>
+                    </div>
+
+                    <div className="mt-6 md:ml-4 md:mt-0 lg:ml-0 lg:mt-6">
+                      <h3 className="text-base font-medium text-gray-900">
+                        {perk.name}
+                      </h3>
+                      <p
+                        className="mt-3 text-sm text-muted-foreground"
+                        dangerouslySetInnerHTML={{ __html: perk.description }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </MaxWidthWrapper>
+            <div>
+              <MaxWidthWrapper>
+                <hr className="my-8 border-gray-300" />
+                <ProductReel
+                  query={{ sort: '-ranking', limit: 8 }}
+                  href="/product"
+                  title="Best Selling Products"
+                />
+              </MaxWidthWrapper>
+            </div>
+          </section>
+        </>
+      )}
     </>
   );
 }

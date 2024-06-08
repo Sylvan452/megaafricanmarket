@@ -19,6 +19,7 @@ const fetchProducts = async (): Promise<Product[]> => {
       images: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      ranking: 0,
     },
     {
       id: '2',
@@ -28,6 +29,7 @@ const fetchProducts = async (): Promise<Product[]> => {
       images: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      ranking: 0,
     },
   ];
 };
@@ -39,7 +41,7 @@ export const productsRouter = router({
         category: z.string().optional(),
         sort: z.enum(['asc', 'desc']).optional(),
         query: z.string().optional(),
-      })
+      }),
     )
     .query(async ({ input }) => {
       const { category, sort, query } = input;
@@ -47,14 +49,13 @@ export const productsRouter = router({
 
       if (category) {
         products = products.filter(
-          (product: Product) => product.category === category
+          (product: Product) => product.category === category,
         );
       }
 
       if (query) {
-        products = products.filter(
-          (product: Product) =>
-            product.name.toLowerCase().includes(query.toLowerCase())
+        products = products.filter((product: Product) =>
+          product.name.toLowerCase().includes(query.toLowerCase()),
         );
       }
 

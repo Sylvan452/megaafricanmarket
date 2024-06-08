@@ -1,8 +1,10 @@
-import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { useCart } from './use-cart';
 
 export const useAuth = () => {
-  const router = useRouter()
+  const router = useRouter();
+  const { clearCart } = useCart();
 
   const signOut = async () => {
     try {
@@ -14,19 +16,21 @@ export const useAuth = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
-      )
+        },
+      );
 
-      if (!res.ok) throw new Error()
+      if (!res.ok) throw new Error();
+      clearCart();
+      localStorage.removeItem('wishlist');
 
-      toast.success('Signed out successfully')
+      toast.success('Signed out successfully');
 
-      router.push('/sign-in')
-      router.refresh()
+      router.push('/sign-in');
+      router.refresh();
     } catch (err) {
-      toast.error("Couldn't sign out, please try again.")
+      toast.error("Couldn't sign out, please try again.");
     }
-  }
+  };
 
-  return { signOut }
-}
+  return { signOut };
+};

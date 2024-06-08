@@ -48,7 +48,27 @@ export interface Product {
   name: string;
   description?: string | null;
   price: number;
-  category: 'seafood' | 'fresh_produce' | 'meat_chicken_fish' | 'frozen_food_vegetable' | 'canned_products' | 'spices';
+  ranking: number;
+  category:
+    | 'seafood'
+    | 'fresh_produce'
+    | 'meat_chicken_fish'
+    | 'frozen_food_vegetable'
+    | 'canned_products'
+    | 'spices'
+    | 'oil'
+    | 'flour'
+    | 'dried_seeds_leaves'
+    | 'garri_grains_beans'
+    | 'rice_noodles_pasta'
+    | 'breakfast_cereal'
+    | 'bakery_bread'
+    | 'beauty_supply_cosmetics'
+    | 'clothes_accessorie'
+    | 'kitchen_household_utensils'
+    | 'snacks'
+    | 'drinks_beverages'
+    | 'others';
   brandCategory?: ('kellogg_s' | 'nestl_' | 'coca_cola') | null;
   priceId?: string | null;
   stripeId?: string | null;

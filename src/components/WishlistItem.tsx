@@ -37,7 +37,6 @@ const WishlistItem: React.FC<WishlistItemProps> = ({
           {product.name}
         </Link>
         <p className="text-gray-500">{product.category}</p>
-        <p className="text-gray-700">{product.description}</p>
       </div>
       <button
         className="text-red-500 hover:text-red-700 focus:outline-none"

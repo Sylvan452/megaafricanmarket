@@ -16,7 +16,7 @@ const ProductPage = () => {
         title="Featured Products"
         subtitle="Browse our latest collection"
         query={query}
-        href="/shop" // Link to the full collection page if available
+        // href="/shop" // Link to the full collection page if available
       />
     </div>
   );

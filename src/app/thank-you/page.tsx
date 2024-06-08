@@ -9,6 +9,8 @@ import { formatPrice } from '@/lib/utils';
 import Link from 'next/link';
 import PaymentStatus from '@/components/PaymentStatus';
 import { useEffect } from 'react';
+import { useCart } from '@/hooks/use-cart';
+import ClearCart from '@/components/ClearCart';
 
 interface PageProps {
   searchParams: {
@@ -49,6 +51,25 @@ const ThankYouPage = async ({ searchParams }: PageProps) => {
   }
 
   const products = order.items.map(({ product }) => product) as Product[];
+  console.log('prods', products);
+  for (const product of products) {
+    console.log('curr prod', product);
+    payload
+      .update({
+        collection: 'products',
+        // id: `664dc8db2e3a6f2b6bf20ca6`,
+        id: product.id,
+        data: {
+          ranking: (product?.ranking || 0) + 1,
+        },
+        // where: {
+        //   id: {
+        //     equals: product.id,
+        //   },
+        // },
+      })
+      .then((r) => console.log('\n\nres', r));
+  }
 
   const orderTotal = products.reduce((total, product) => {
     return total + product.price;
@@ -56,11 +77,13 @@ const ThankYouPage = async ({ searchParams }: PageProps) => {
 
   return (
     <main className="mt-12 relative lg:min-h-full">
+      <ClearCart />
       <div className="hidden lg:block h-80 overflow-hidden lg:absolute lg:h-full lg:w-1/2 lg:pr-4 xl:pr-12">
         <Image
-          fill
+          width={600}
+          height={600}
           src="/thank_you.png"
-          className="h-full w-full object-cover object-center"
+          className="object-cover object-center"
           alt="thank you for your order"
         />
       </div>

@@ -6,18 +6,20 @@ import { trpc } from '@/trpc/client';
 import Link from 'next/link';
 import { useState } from 'react';
 import ProductListing from './ProductListing';
+import { boolean } from 'zod';
 
 interface ProductReelProps {
   title: string;
   subtitle?: string;
   href?: string;
   query: TQueryValidator;
+  isSearch?: boolean;
 }
 
 const FALLBACK_LIMIT = 8;
 
 const ProductReel = (props: ProductReelProps) => {
-  const { title, subtitle, href, query } = props;
+  const { title, subtitle, href, query, isSearch } = props;
   const [currentPage, setCurrentPage] = useState(1);
 
   const { data: queryResults, isLoading } =
@@ -26,6 +28,7 @@ const ProductReel = (props: ProductReelProps) => {
         limit: query.limit ?? FALLBACK_LIMIT,
         page: currentPage,
         query,
+        isSearch,
       },
       {
         getNextPageParam: (lastPage) => lastPage.nextPage,
@@ -33,7 +36,8 @@ const ProductReel = (props: ProductReelProps) => {
     );
 
   const products = queryResults?.pages.flatMap((page) => page.items);
-
+  console.log(title, 'products', products);
+  // console.log('query', query);
   let map: (Product | null)[] = [];
   if (products && products.length) {
     map = products;
@@ -83,6 +87,7 @@ const ProductReel = (props: ProductReelProps) => {
                 key={`product-${i}`}
                 product={product}
                 index={i}
+                isLoggedIn={false}
               />
             ))}
           </div>

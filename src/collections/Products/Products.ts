@@ -1,8 +1,7 @@
 import { BeforeChangeHook } from 'payload/dist/collections/config/types';
 import { CollectionConfig } from 'payload/types';
-import { Product } from '../../payload-types'
+import { Product } from '../../payload-types';
 import { stripe } from '../../lib/stripe';
-
 
 export const PRODUCT_CATEGORIES = [
   {
@@ -18,7 +17,7 @@ export const PRODUCT_CATEGORIES = [
     value: 'meat_chicken_fish',
   },
   {
-    label: "Frozen Food/Vegetable",
+    label: 'Frozen Food/Vegetable',
     value: 'frozen_food_vegetable',
   },
   {
@@ -30,26 +29,71 @@ export const PRODUCT_CATEGORIES = [
     value: 'spices',
   },
   {
-    label: 'Spices',
-    value: 'spices',
+    label: 'Oil',
+    value: 'oil',
   },
   {
-    label: 'Spices',
-    value: 'spices',
+    label: 'Flour',
+    value: 'flour',
+  },
+  {
+    label: 'Dried Seeds/Leaves',
+    value: 'dried_seeds_leaves',
+  },
+  {
+    label: 'Garri/Grains/Beans',
+    value: 'garri_grains_beans',
+  },
+  {
+    label: 'Rice/Noodles/Pasta',
+    value: 'rice_noodles_pasta',
+  },
+  {
+    label: 'Breakfast/Cereal',
+    value: 'breakfast_cereal',
+  },
+  {
+    label: 'Bakery/Bread',
+    value: 'bakery_bread',
+  },
+  {
+    label: 'Beauty Supplies/Cosmetics',
+    value: 'beauty_supply_cosmetics',
+  },
+  {
+    label: 'Clothes/Accessories',
+    value: 'clothes_accessorie',
+  },
+  {
+    label: 'Kitchen/Household Utensils',
+    value: 'kitchen_household_utensils',
+  },
+  {
+    label: 'Snacks',
+    value: 'snacks',
+  },
+  {
+    label: 'Drinks/Beverages',
+    value: 'drinks_beverages',
+  },
+  {
+    label: 'Others',
+    value: 'others',
   },
 ];
 
-export const PRODUCT_BRANDS = [ // Change the variable name to PRODUCT_BRANDS
+export const PRODUCT_BRANDS = [
+  // Change the variable name to PRODUCT_BRANDS
   "Kellogg's", // Directly store the brand names
   'Nestlé',
   'Coca-Cola',
 ];
 
-const addUser: BeforeChangeHook<Product> = async ({req, data}) => {
-  const user = req.user
+const addUser: BeforeChangeHook<Product> = async ({ req, data }) => {
+  const user = req.user;
 
-  return {...data, user: user.id}
-}
+  return { ...data, ...(user?.id ? { user: user?.id } : {}) };
+};
 export const Products: CollectionConfig = {
   slug: 'products',
   admin: {
@@ -61,51 +105,53 @@ export const Products: CollectionConfig = {
     },
     read: () => true,
     update: ({ req: { user } }) => {
-      return user && (user.role === 'admin' || user.role === 'subadmin');
+      return true;
+      // return user && (user.role === 'admin' || user.role === 'subadmin');
     },
     delete: ({ req: { user } }) => {
       return user && user.role === 'admin';
     },
   },
   hooks: {
-    beforeChange: [addUser, async (args) =>{
-      if(args.operation === 'create') {
-        const data = args.data as Product
+    beforeChange: [
+      addUser,
+      async (args) => {
+        if (args.operation === 'create') {
+          const data = args.data as Product;
 
-        const createdProduct = await stripe.products.create({
-          name: data.name,
-          default_price_data: {
-            currency: 'USD',
-            unit_amount: Math.round(data.price * 100),
-          }
-        })
-        const updated: Product = {
-          ...data,
-          stripeId: createdProduct.id,
-          priceId: createdProduct.default_price as string
+          const createdProduct = await stripe.products.create({
+            name: data.name,
+            default_price_data: {
+              currency: 'USD',
+              unit_amount: Math.round(data.price * 100),
+            },
+          });
+          const updated: Product = {
+            ...data,
+            stripeId: createdProduct.id,
+            priceId: createdProduct.default_price as string,
+          };
+
+          return updated;
+        } else if (args.operation === 'update') {
+          const data = args.data as Product;
+
+          const updatedProduct = await stripe.products.update(data.stripeId!, {
+            name: data.name,
+            default_price: data.priceId!,
+          });
+          const updated: Product = {
+            ...data,
+            stripeId: updatedProduct.id,
+            priceId: updatedProduct.default_price as string,
+          };
+
+          return updated;
         }
-
-        return updated
-      } else if(args.operation === 'update') {
-        const data = args.data as Product
-
-        const updatedProduct = await stripe.products.update(data.stripeId!, {
-          name: data.name,
-          default_price: data.priceId!,
-        })
-        const updated: Product = {
-          ...data,
-          stripeId: updatedProduct.id,
-          priceId: updatedProduct.default_price as string
-        }
-
-        return updated
-
-      }
-    },
-  ],
+      },
+    ],
   },
-  
+
   fields: [
     {
       name: 'user',
@@ -138,6 +184,15 @@ export const Products: CollectionConfig = {
       required: true,
     },
     {
+      name: 'ranking',
+      label: 'Number of times purchased',
+      // min: 0,
+      // max: 1000,
+      type: 'number',
+      required: true,
+      defaultValue: 0,
+    },
+    {
       name: 'category',
       label: 'Category',
       type: 'select',
@@ -151,7 +206,8 @@ export const Products: CollectionConfig = {
       name: 'brandCategory',
       label: 'Brand Category',
       type: 'select',
-      options: PRODUCT_BRANDS.map((brand) => ({ // Use PRODUCT_BRANDS directly
+      options: PRODUCT_BRANDS.map((brand) => ({
+        // Use PRODUCT_BRANDS directly
         label: brand,
         value: brand.toLowerCase().replace(/[^a-zA-Z0-9]+/g, '_'), // Convert to lowercase and replace special characters
       })),
@@ -199,7 +255,7 @@ export const Products: CollectionConfig = {
           relationTo: 'media',
           required: true,
         },
-      ]
-    }
+      ],
+    },
   ],
 };

@@ -13,17 +13,26 @@ import {
   SheetTitle,
   SheetFooter,
 } from './ui/sheet';
-import { formatPrice, calculateShippingCost } from '@/lib/utils';
+import {
+  formatPrice,
+  calculateShippingCost,
+  calcDistanceFrom,
+  searchLocation,
+} from '@/lib/utils';
 import { buttonVariants } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
 import { useCart } from '@/hooks/use-cart';
 import CartItem from './CartItem';
 
+let settingAddress = false;
+let shipingDeets : {address?: string; city?: string} = {};
+
 const Cart = () => {
   const { items } = useCart();
   const itemCount = items.length;
 
-  const [isMounted, setIsMounted] = useState(false);
+  const [isMounted, setIsMounted] = useState(true);
+  // const [isMounted, setIsMounted] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
   const [deliveryMethod, setDeliveryMethod] = useState('ship');
   const [distance, setDistance] = useState(0);
@@ -31,12 +40,13 @@ const Cart = () => {
 
   const [shippingDetails, setShippingDetails] = useState({
     country: 'US',
-    firstName: '',
-    lastName: '',
+    // firstName: '',
+    // lastName: '',
+    name: '',
     address: '',
-    apartment: '',
+    // apartment: '',
     city: '',
-    zip: '',
+    // zip: '',
     phone: '',
   });
 
@@ -76,14 +86,62 @@ const Cart = () => {
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = event.target;
-    setShippingDetails((prevDetails) => ({ ...prevDetails, [name]: value }));
+    console.log('name', name, 'value', value);
+    setShippingDetails((prevDetails) => {
+      shipingDeets = { ...prevDetails, [name]: value };
+      return { ...prevDetails, [name]: value };
+    });
   };
 
   const fee = 1;
 
+  function getDist() {}
+
+  const handleDistanceCalculations = async () => {
+    console.log('current shipping deet', shipingDeets);
+    const loc = (
+      await searchLocation(
+        shipingDeets?.address,
+        shipingDeets?.city,
+        // shippingDetails.country,
+        'NG',
+      )
+    )?.[0];
+
+    console.log('got location', loc);
+
+    if (!loc?.isConfident) return;
+
+    const dist = await calcDistanceFrom(loc?.location);
+    console.log('got dist', dist);
+
+    if (!dist) return console.log('unable to calc distance');
+
+    setDistance(dist);
+
+    setDeliveryFee(calculateShippingCost(dist));
+
+    if (settingAddress) setTimeout(handleDistanceCalculations, 5000);
+  };
+
+  function handleSettingAddress(): void {
+    settingAddress = true;
+    // calculate distance (along with getting location) every five secs
+    // get location, display, calculate distance, calc price
+    setTimeout(handleDistanceCalculations, 5000);
+  }
+
+  function handleAddressSet(): void {
+    settingAddress = false;
+    handleDistanceCalculations();
+  }
+
   return (
     <Sheet>
-      <SheetTrigger className="group -m-2 flex items-center p-2">
+      <SheetTrigger
+        defaultChecked={false}
+        className="group -m-2 flex items-center p-2"
+      >
         <ShoppingCart
           aria-hidden="true"
           className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
@@ -158,17 +216,19 @@ const Cart = () => {
                             </select>
                           </div>
                           <div>
-                            <label htmlFor="firstName">First Name</label>
+                            <label htmlFor="firstName">
+                              Receiver{"'"}s Name
+                            </label>
                             <input
                               type="text"
-                              id="firstName"
-                              name="firstName"
-                              value={shippingDetails.firstName}
+                              id="name"
+                              name="name"
+                              value={shippingDetails.name}
                               onChange={handleShippingDetailChange}
                               className="border p-1 w-full"
                             />
                           </div>
-                          <div>
+                          {/* <div>
                             <label htmlFor="lastName">Last Name</label>
                             <input
                               type="text"
@@ -178,19 +238,22 @@ const Cart = () => {
                               onChange={handleShippingDetailChange}
                               className="border p-1 w-full"
                             />
-                          </div>
+                          </div> */}
                           <div>
-                            <label htmlFor="address">Address</label>
+                            <label htmlFor="address">Complete Address</label>
                             <input
                               type="text"
                               id="address"
                               name="address"
                               value={shippingDetails.address}
                               onChange={handleShippingDetailChange}
+                              onFocus={handleSettingAddress}
+                              onBlur={handleAddressSet}
                               className="border p-1 w-full"
+                              required
                             />
                           </div>
-                          <div>
+                          {/* <div>
                             <label htmlFor="apartment">
                               Apartment, Suite, etc. (optional)
                             </label>
@@ -202,7 +265,7 @@ const Cart = () => {
                               onChange={handleShippingDetailChange}
                               className="border p-1 w-full"
                             />
-                          </div>
+                          </div> */}
                           <div>
                             <label htmlFor="city">City</label>
                             <input
@@ -214,7 +277,7 @@ const Cart = () => {
                               className="border p-1 w-full"
                             />
                           </div>
-                          <div>
+                          {/* <div>
                             <label htmlFor="zip">Zip Code</label>
                             <input
                               type="text"
@@ -224,9 +287,9 @@ const Cart = () => {
                               onChange={handleShippingDetailChange}
                               className="border p-1 w-full"
                             />
-                          </div>
+                          </div> */}
                           <div>
-                            <label htmlFor="phone">Phone Number</label>
+                            <label htmlFor="phone">Contact Phone Number</label>
                             <input
                               type="text"
                               id="phone"
@@ -244,6 +307,7 @@ const Cart = () => {
                             id="distance"
                             value={distance}
                             onChange={handleDistanceChange}
+                            disabled
                             className="border p-1"
                             min="0"
                           />

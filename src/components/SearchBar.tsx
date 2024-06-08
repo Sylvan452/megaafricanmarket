@@ -16,6 +16,7 @@ const SearchBar = () => {
       params.delete('query');
     }
     router.replace(`${pathname}?${params.toString()}`);
+    router.refresh();
   };
 
   return (

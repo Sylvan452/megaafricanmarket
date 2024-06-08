@@ -19,7 +19,7 @@ const editor = slateEditor({}) as unknown as RichTextAdapter<any[], any, any>;
 
 export default buildConfig({
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000',
-  collections: [Users, Products, Media, Orders], 
+  collections: [Users, Products, Media, Orders],
   routes: {
     admin: '/sell',
   },
