@@ -141,3 +141,61 @@ export async function searchLocation(
 // });
 
 // Response: {"error":{"code":2010,"message":"Could not find routable point within a radius of 350.0 meters of specified coordinate 0: -91.8678050 31.1695460.; Could not find routable point within a radius of 350.0 meters of specified coordinate 1: -89.3294675 31.9881085."},"info":{"engine":{"build_date":"2024-05-14T10:47:52Z","version":"8.0.1"},"timestamp":1717846488686}}
+
+export async function getDeliverFeeForLocation(
+  address: string,
+  city: string,
+  country: string,
+) {
+  // console.log('current shipping deet', shippingDetails);
+  const loc = (
+    await searchLocation(
+      address,
+      city,
+      // shippingDetails.country,
+      'NG',
+    )
+  )?.[0];
+
+  console.log('got location', loc);
+
+  if (!loc?.isConfident) return;
+
+  const dist = await calcDistanceFrom(loc?.location);
+  console.log('got dist', dist);
+
+  if (!dist) return console.log('unable to calc distance');
+
+  // setDistance(dist);
+
+  const deliveryFee = calculateShippingCost(dist);
+  console.log('delivery fee', deliveryFee, 'dist:', dist);
+  return deliveryFee;
+}
+
+export async function getDeliverDistForLocation(
+  address: string,
+  city: string,
+  country: string,
+) {
+  // console.log('current shipping deet', shippingDetails);
+  const loc = (
+    await searchLocation(
+      address,
+      city,
+      // shippingDetails.country,
+      'NG',
+    )
+  )?.[0];
+
+  console.log('got location', loc);
+
+  if (!loc?.isConfident) return;
+
+  const dist = await calcDistanceFrom(loc?.location);
+  console.log('got dist', dist);
+
+  if (!dist) return console.log('unable to calc distance');
+
+  return dist;
+}

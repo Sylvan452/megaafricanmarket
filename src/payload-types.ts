@@ -136,6 +136,14 @@ export interface Order {
     id?: string | null;
   }[];
   _isPaid?: boolean | null;
+  deliveryMethod: 'pickup' | 'ship';
+  deliveryDetails?: {
+    name?: string | null;
+    phone?: string | null;
+    country?: string | null;
+    city?: string | null;
+    address?: string | null;
+  };
   totalAmount: number;
   createdAt: string;
   updatedAt: string;

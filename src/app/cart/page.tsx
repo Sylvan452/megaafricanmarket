@@ -3,7 +3,14 @@
 import { Button } from '@/components/ui/button';
 import { PRODUCT_CATEGORIES } from '@/config';
 import { useCart } from '@/hooks/use-cart';
-import { cn, formatPrice } from '@/lib/utils';
+import {
+  calcDistanceFrom,
+  calculateShippingCost,
+  cn,
+  formatPrice,
+  getDeliverFeeForLocation,
+  searchLocation,
+} from '@/lib/utils';
 import { trpc } from '@/trpc/client';
 import { Check, Loader2, X } from 'lucide-react';
 import Image from 'next/image';
@@ -32,6 +39,44 @@ const Page = () => {
   const [isMounted, setIsMounted] = useState<boolean>(false);
   const [cartTotal, setCartTotal] = useState<number>(0);
   const [isSheetOpen, setIsSheetOpen] = useState<boolean>(false);
+  const [deliveryfee, setDeliveryFee] = useState(0);
+  const [needsDelivery, setNeedsDelivery] = useState(false);
+  const [shippingDeets, setShippingDeets] = useState();
+
+  useEffect(() => {
+    // localStorage.removeItem('delivery-details');
+    localStorage.removeItem('deliveryFee');
+    (async () => {
+      const { method, ...shippingDetails } = JSON.parse(
+        localStorage.getItem('delivery-details') || '{}',
+      );
+      console.log('method:', method, 'deets', shippingDetails);
+      if (method === 'ship') {
+        setShippingDeets(shippingDetails);
+        setNeedsDelivery(true);
+        console.log('current shipping deet', shippingDetails);
+
+        const deliveryFee = await getDeliverFeeForLocation(
+          shippingDetails?.address,
+          shippingDetails?.city,
+          // shippingDetails.country,
+          'NG',
+        );
+
+        setDeliveryFee(deliveryFee!);
+        if (deliveryFee)
+          localStorage.setItem('deliveryFee', formatPrice(deliveryfee));
+        // setShippingDetails((old) => {
+        //   const update = { ...old, address: loc?.address };
+        //   localStorage.setItem('delivery-details', JSON.stringify(update));
+        //   return update;
+        // });
+      }
+      setIsMounted(true);
+    })();
+    // setDeliveryMethod(method || 'pickup');
+    // setShippingDetails(shippingDetails);
+  }, []);
 
   const recalculateTotal = useCallback(() => {
     const total = items.reduce(
@@ -42,7 +87,7 @@ const Page = () => {
   }, [items]);
 
   useEffect(() => {
-    setIsMounted(true);
+    // setIsMounted(true);
     recalculateTotal();
   }, [items, recalculateTotal]);
 
@@ -53,8 +98,8 @@ const Page = () => {
 
   const transationfeeString = process.env.TRANSATION_FEE || '1';
   const fee = parseFloat(transationfeeString);
-  const deliveryfeeString = process.env.SHIPPING_PRICE_ID || '0';
-  const deliveryfee = parseFloat(deliveryfeeString);
+  // const deliveryfeeString = process.env.SHIPPING_PRICE_ID || '0';
+  // const deliveryfee = parseFloat(deliveryfeeString);
 
   const calculateTotalAmount = (): number => {
     return cartTotal + fee + deliveryfee;
@@ -73,7 +118,8 @@ const Page = () => {
         } as any as { product: string; quantity: number };
       }),
       totalAmount,
-      needsShipping: false,
+      needsShipping: needsDelivery,
+      shippingDeets,
     });
     console.log('sent');
   };
@@ -198,12 +244,12 @@ const Page = () => {
 
             <div className="mt-6">
               <Button
-                disabled={items.length === 0 || isLoading}
+                disabled={items.length === 0 || isLoading || !isMounted}
                 onClick={handleCheckout} // Use handleCheckout here
                 className="w-full"
                 size="lg"
               >
-                {isLoading ? (
+                {isLoading || !isMounted ? (
                   <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
                 ) : null}
                 Checkout

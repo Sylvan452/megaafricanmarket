@@ -38,6 +38,52 @@ const Orders: CollectionConfig = {
       },
     },
     {
+      name: 'deliveryMethod',
+      type: 'select',
+      options: [
+        {
+          label: 'Pick Up',
+          value: 'pickup',
+        },
+        {
+          label: 'Shipping',
+          value: 'ship',
+        },
+      ],
+      required: true,
+      // access: {
+      //   read: ({ req }) => req.user.role === 'admin',
+      // },
+    },
+
+    {
+      name: 'deliveryDetails',
+      type: 'group', // required
+      fields: [
+        // required
+        {
+          name: 'name',
+          type: 'text',
+        },
+        {
+          name: 'phone',
+          type: 'text',
+        },
+        {
+          name: 'country',
+          type: 'text',
+        },
+        {
+          name: 'city',
+          type: 'text',
+        },
+        {
+          name: 'address',
+          type: 'text',
+        },
+      ],
+    },
+    {
       name: 'totalAmount',
       type: 'number',
       required: true,

@@ -5,6 +5,7 @@ import { getPayloadClient } from '../get-payload';
 import { stripe } from '../lib/stripe';
 import type Stripe from 'stripe';
 import { Product } from '@/payload-types';
+import { getDeliverDistForLocation } from '../lib/utils';
 
 export const paymentRouter = router({
   createSession: privateProcedure
@@ -20,12 +21,21 @@ export const paymentRouter = router({
         //
         totalAmount: z.number(),
         needsShipping: z.boolean(),
+        shippingDeets: z
+          .object({
+            name: z.string().optional(),
+            phone: z.string().optional(),
+            country: z.string().optional(),
+            city: z.string().optional(),
+            address: z.string().optional(),
+          })
+          .optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       console.log('\n\nstarted');
       const { user } = ctx;
-      const { items, totalAmount, needsShipping } = input;
+      const { items, totalAmount, needsShipping, shippingDeets } = input;
       console.log('\n\nstarted2');
 
       if (items.length === 0) {
@@ -89,6 +99,13 @@ export const paymentRouter = router({
             // price_SHIPPING: '',
             //
             totalAmount,
+            // ...(needsShipping
+            //   ? { deliveryMethod: 'ship' }
+            //   : { deliveryMethod: 'pickup' }),
+            deliveryMethod: (needsShipping ? 'ship' : 'pickup') as
+              | 'ship'
+              | 'pickup',
+            ...(needsShipping ? { deliveryDetails: shippingDeets } : {}),
           },
         });
 
@@ -117,10 +134,33 @@ export const paymentRouter = router({
           if (shippingPriceId) {
             try {
               // Validate the shipping price ID
-              await stripe.prices.retrieve(shippingPriceId);
+              console.log('retrieving');
+              try {
+                const price = await stripe.prices.retrieve(shippingPriceId);
+                console.log('price retrieved', price);
+              } catch (err) {
+                console.log('error while rereiving price', err);
+              }
               line_items.push({
                 price: shippingPriceId,
-                quantity: 1,
+                quantity: (await (async () => {
+                  try {
+                    const dist = await getDeliverDistForLocation(
+                      shippingDeets?.address!,
+                      shippingDeets?.city!,
+                      shippingDeets?.country!,
+                    );
+                    console.log('dist calculated', dist);
+                    if (dist && dist - 5 > 0) return Math.round(dist - 5);
+                  } catch (err) {
+                    console.log(
+                      'err occurede while calculating distance\n',
+                      err,
+                    );
+                  }
+                  return 0;
+                })()!) as number,
+                // quantity: 1,
                 adjustable_quantity: {
                   enabled: false,
                 },

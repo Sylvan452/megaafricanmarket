@@ -11,6 +11,7 @@ import PaymentStatus from '@/components/PaymentStatus';
 import { useEffect } from 'react';
 import { useCart } from '@/hooks/use-cart';
 import ClearCart from '@/components/ClearCart';
+import { ShippingPrice } from '@/components/ShippingPrice';
 
 interface PageProps {
   searchParams: {
@@ -167,6 +168,7 @@ const ThankYouPage = async ({ searchParams }: PageProps) => {
                 <p>Transaction Fee</p>
                 <p className="text-gray-900">{formatPrice(1)}</p>
               </div>
+              <ShippingPrice />
 
               <div className="flex items-center justify-between border-t border-gray-200 pt-6 text-gray-900">
                 <p className="text-base">Total</p>

@@ -25,7 +25,7 @@ import { useCart } from '@/hooks/use-cart';
 import CartItem from './CartItem';
 
 let settingAddress = false;
-let shipingDeets : {address?: string; city?: string} = {};
+let shipingDeets: { address?: string; city?: string } = {};
 
 const Cart = () => {
   const { items } = useCart();
@@ -34,7 +34,7 @@ const Cart = () => {
   const [isMounted, setIsMounted] = useState(true);
   // const [isMounted, setIsMounted] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
-  const [deliveryMethod, setDeliveryMethod] = useState('ship');
+  const [deliveryMethod, setDeliveryMethod] = useState('pickup');
   const [distance, setDistance] = useState(0);
   const [deliveryFee, setDeliveryFee] = useState(0);
 
@@ -60,6 +60,15 @@ const Cart = () => {
   }, [items, distance]);
 
   useEffect(() => {
+    // localStorage.removeItem('delivery-details');
+    const { method, ...shippingDetails } = JSON.parse(
+      localStorage.getItem('delivery-details') || '{}',
+    );
+    setDeliveryMethod(method || 'pickup');
+    setShippingDetails(shippingDetails);
+  }, []);
+
+  useEffect(() => {
     setIsMounted(true);
     recalculateTotal();
   }, [items, deliveryMethod, distance, recalculateTotal]);
@@ -75,7 +84,22 @@ const Cart = () => {
   const handleDeliveryMethodChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
+    console.log('setting delivery method', event.target.value);
+    if (event.target.value === 'ship') {
+      handleDistanceCalculations();
+    } else {
+      // localStorage.removeItem('delivery-details');
+      setDeliveryFee(0);
+    }
     setDeliveryMethod(event.target.value);
+    localStorage.setItem(
+      'delivery-details',
+      JSON.stringify({ ...shippingDetails, method: event.target.value }),
+    );
+    console.log(
+      'delivery method set',
+      localStorage.getItem('delivery-details'),
+    );
   };
 
   const handleDistanceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,9 +119,8 @@ const Cart = () => {
 
   const fee = 1;
 
-  function getDist() {}
-
   const handleDistanceCalculations = async () => {
+    if (settingAddress) setTimeout(handleDistanceCalculations, 5000);
     console.log('current shipping deet', shipingDeets);
     const loc = (
       await searchLocation(
@@ -119,9 +142,14 @@ const Cart = () => {
 
     setDistance(dist);
 
-    setDeliveryFee(calculateShippingCost(dist));
-
-    if (settingAddress) setTimeout(handleDistanceCalculations, 5000);
+    const deliveryFee = calculateShippingCost(dist);
+    console.log('delivery fee', deliveryFee, 'dist:', dist);
+    setDeliveryFee(deliveryFee);
+    setShippingDetails((old) => {
+      const update = { ...old, address: loc?.address };
+      localStorage.setItem('delivery-details', JSON.stringify(update));
+      return update;
+    });
   };
 
   function handleSettingAddress(): void {
@@ -174,6 +202,17 @@ const Cart = () => {
                     <div className="flex items-center space-x-2">
                       <input
                         type="radio"
+                        id="pickup"
+                        name="deliveryMethod"
+                        value="pickup"
+                        checked={deliveryMethod === 'pickup'}
+                        onChange={handleDeliveryMethodChange}
+                      />
+                      <label htmlFor="pickup">Pick Up</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
                         id="ship"
                         name="deliveryMethod"
                         value="ship"
@@ -187,17 +226,6 @@ const Cart = () => {
                           apply)
                         </span>
                       </label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="radio"
-                        id="pickup"
-                        name="deliveryMethod"
-                        value="pickup"
-                        checked={deliveryMethod === 'pickup'}
-                        onChange={handleDeliveryMethodChange}
-                      />
-                      <label htmlFor="pickup">Pick Up</label>
                     </div>
                     {deliveryMethod === 'ship' && (
                       <>
@@ -214,6 +242,32 @@ const Cart = () => {
                               <option value="US">United States</option>
                               <option value="CA">Canada</option>
                             </select>
+                          </div>
+
+                          <div>
+                            <label htmlFor="city">City</label>
+                            <input
+                              type="text"
+                              id="city"
+                              name="city"
+                              value={shippingDetails.city}
+                              onChange={handleShippingDetailChange}
+                              className="border p-1 w-full"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="address">Complete Address</label>
+                            <input
+                              type="text"
+                              id="address"
+                              name="address"
+                              value={shippingDetails.address}
+                              onChange={handleShippingDetailChange}
+                              onFocus={handleSettingAddress}
+                              onBlur={handleAddressSet}
+                              className="border p-1 w-full"
+                              required
+                            />
                           </div>
                           <div>
                             <label htmlFor="firstName">
@@ -239,20 +293,6 @@ const Cart = () => {
                               className="border p-1 w-full"
                             />
                           </div> */}
-                          <div>
-                            <label htmlFor="address">Complete Address</label>
-                            <input
-                              type="text"
-                              id="address"
-                              name="address"
-                              value={shippingDetails.address}
-                              onChange={handleShippingDetailChange}
-                              onFocus={handleSettingAddress}
-                              onBlur={handleAddressSet}
-                              className="border p-1 w-full"
-                              required
-                            />
-                          </div>
                           {/* <div>
                             <label htmlFor="apartment">
                               Apartment, Suite, etc. (optional)
@@ -266,17 +306,6 @@ const Cart = () => {
                               className="border p-1 w-full"
                             />
                           </div> */}
-                          <div>
-                            <label htmlFor="city">City</label>
-                            <input
-                              type="text"
-                              id="city"
-                              name="city"
-                              value={shippingDetails.city}
-                              onChange={handleShippingDetailChange}
-                              className="border p-1 w-full"
-                            />
-                          </div>
                           {/* <div>
                             <label htmlFor="zip">Zip Code</label>
                             <input
