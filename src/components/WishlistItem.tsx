@@ -21,7 +21,7 @@ const WishlistItem: React.FC<WishlistItemProps> = ({
       <Link href={`/product/${product.id}`} onClick={onClose}>
         <span>
           <Image
-            src={image.url}
+            src={typeof image === 'string' ? image : image.url!}
             alt={product.name}
             width={100} // Ensure width is provided
             height={100} // Ensure height is provided

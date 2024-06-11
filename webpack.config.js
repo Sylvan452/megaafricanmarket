@@ -1,7 +1,11 @@
 const path = require('path');
 const webpack = require('webpack');
+const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
+  target: 'node', // in order to ignore built-in modules like path, fs, etc.
+  externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
+
   entry: './src/index.tsx',
   module: {
     rules: [
@@ -12,14 +16,16 @@ module.exports = {
       },
       {
         test: /\.jsx?$/,
-        exclude: /node_modules/,
+        exclude: /.\/node_modules\/(?!payload)/,
+        // exclude: /node_modules\/(?!payload)/,
+        // exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
           options: {
             presets: [
               '@babel/preset-env',
               '@babel/preset-react',
-              '@babel/preset-typescript'
+              '@babel/preset-typescript',
             ],
           },
         },
@@ -38,11 +44,11 @@ module.exports = {
     buildDependencies: {
       config: [__filename], // Cache is invalidated when the configuration file changes
     },
-    cacheDirectory: path.resolve(__dirname, '.webpack_cache') // Explicitly set cache directory
+    cacheDirectory: path.resolve(__dirname, '.webpack_cache'), // Explicitly set cache directory
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('development')
-    })
-  ]
+      'process.env.NODE_ENV': JSON.stringify('development'),
+    }),
+  ],
 };

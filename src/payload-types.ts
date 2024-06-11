@@ -145,6 +145,7 @@ export interface Order {
     address?: string | null;
   };
   totalAmount: number;
+  paymentIntent?: string | null;
   createdAt: string;
   updatedAt: string;
 }

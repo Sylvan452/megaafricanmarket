@@ -14,7 +14,7 @@ import AddToCartButton from './AddToCartButton';
 interface ProductListingProps {
   product: Product | null;
   index: number;
-  isLoggedIn: boolean;
+  isLoggedIn?: boolean;
 }
 
 const ProductListing = ({

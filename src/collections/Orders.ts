@@ -89,6 +89,16 @@ const Orders: CollectionConfig = {
       required: true,
     },
     {
+      name: 'paymentIntent',
+      type: 'text',
+      access: {
+        read: () => true,
+        update: () => false,
+        create: () => false,
+      },
+      // required: true,
+    },
+    {
       name: 'createdAt',
       type: 'date',
       required: true,

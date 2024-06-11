@@ -37,7 +37,7 @@ export const calculateShippingCost = (distance: number): number => {
     return 0; // Free delivery up to 5 miles
   } else {
     const extraMiles = distance - freeDistance;
-    return extraMiles * chargePerMile;
+    return Math.round(extraMiles * chargePerMile);
   }
 };
 

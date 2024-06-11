@@ -1,7 +1,7 @@
 import { getServerSideUser } from '@/lib/payload.utils';
 import Image from 'next/image';
 import { cookies } from 'next/headers';
-import { getPayloadClient } from '@/get-payload';
+import { getPayloadClient } from '../../get-payload';
 import { notFound, redirect } from 'next/navigation';
 import { Product, User } from '@/payload-types';
 import { PRODUCT_CATEGORIES } from '@/config';
@@ -39,8 +39,6 @@ const ThankYouPage = async ({ searchParams }: PageProps) => {
   });
 
   const [order] = orders;
-
-  // useEffect(() => {}, []);
 
   if (!order) return notFound();
 
@@ -168,11 +166,11 @@ const ThankYouPage = async ({ searchParams }: PageProps) => {
                 <p>Transaction Fee</p>
                 <p className="text-gray-900">{formatPrice(1)}</p>
               </div>
-              <ShippingPrice />
+              {order.deliveryMethod == 'ship' && <ShippingPrice />}
 
               <div className="flex items-center justify-between border-t border-gray-200 pt-6 text-gray-900">
                 <p className="text-base">Total</p>
-                <p className="text-base">{formatPrice(orderTotal + 1)}</p>
+                <p className="text-base">{formatPrice(order.totalAmount)}</p>
               </div>
             </div>
 

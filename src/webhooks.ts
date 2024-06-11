@@ -14,8 +14,8 @@ export const stripeWebhookHandler = async (
   res: express.Response,
 ) => {
   console.log('STRIPE WEBHOOK RECEIVED');
-  console.log();
-  console.log(req.body);
+  // console.log();
+  // console.log(req.body);
   console.log();
   console.log(JSON.stringify(req.body, null, 2));
   console.log();
@@ -45,13 +45,11 @@ export const stripeWebhookHandler = async (
 
   const session = event.data.object as Stripe.Checkout.Session;
 
-  if (!session?.metadata?.userId || !session?.metadata?.orderId) {
-    return res.status(400).send(`Webhook Error: No user present in metadata`);
-  }
-
+  const payload = await getPayloadClient();
   if (event.type === 'checkout.session.completed') {
-    const payload = await getPayloadClient();
-
+    if (!session?.metadata?.userId || !session?.metadata?.orderId) {
+      return res.status(400).send(`Webhook Error: No user present in metadata`);
+    }
     const { docs: users } = await payload.find({
       collection: 'users',
       where: {
@@ -79,10 +77,11 @@ export const stripeWebhookHandler = async (
 
     if (!order) return res.status(404).json({ error: 'No such order exists.' });
 
-    await payload.update({
+    const completedUpdate = await payload.update({
       collection: 'orders',
       data: {
-        _isPaid: true,
+        paymentIntent: event.data.object.payment_intent as string,
+        // _isPaid: true,
       },
       where: {
         id: {
@@ -90,8 +89,9 @@ export const stripeWebhookHandler = async (
         },
       },
     });
+    console.log('checkout completed update', completedUpdate);
 
-    console.log('\n\nitems', order.items);
+    // console.log('\n\nitems', order.items);
     // for (const product of order.products) {
     //   // const productDoc =
 
@@ -125,6 +125,20 @@ export const stripeWebhookHandler = async (
     } catch (error) {
       res.status(500).json({ error });
     }
+  }
+
+  if (event.type === 'charge.updated') {
+    const isPaidUpdate = await payload.update({
+      collection: 'orders',
+      data: {
+        _isPaid: event.data.object.paid,
+      },
+      where: {
+        paymentIntent: { equals: event.data.object.payment_intent as string },
+      },
+    });
+
+    console.log('paid update', isPaidUpdate);
   }
 
   return res.status(200).send();

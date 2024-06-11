@@ -56,16 +56,18 @@ const Page = () => {
         setNeedsDelivery(true);
         console.log('current shipping deet', shippingDetails);
 
-        const deliveryFee = await getDeliverFeeForLocation(
+        const deliveryCost: number | void = await getDeliverFeeForLocation(
           shippingDetails?.address,
           shippingDetails?.city,
           // shippingDetails.country,
           'NG',
         );
 
-        setDeliveryFee(deliveryFee!);
-        if (deliveryFee)
-          localStorage.setItem('deliveryFee', formatPrice(deliveryfee));
+        setDeliveryFee(deliveryCost!);
+        console.log('deliveryFee', deliveryCost);
+        console.log('deliveryFee formatteddd', formatPrice(deliveryCost!));
+        if (deliveryCost)
+          localStorage.setItem('deliveryFee', deliveryCost.toString());
         // setShippingDetails((old) => {
         //   const update = { ...old, address: loc?.address };
         //   localStorage.setItem('delivery-details', JSON.stringify(update));
