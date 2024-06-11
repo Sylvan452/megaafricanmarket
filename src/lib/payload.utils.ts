@@ -13,7 +13,8 @@ export const getServerSideUser = async (
   }
 
   const meRes = await fetch(
-    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/me`,
+    // `${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/me`,
+    `https://megaafricanmarket-production-b5f4.up.railway.app/api/users/me`,
     {
       headers: {
         Authorization: `JWT ${token}`,
