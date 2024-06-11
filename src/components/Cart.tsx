@@ -65,6 +65,7 @@ const Cart = () => {
       localStorage.getItem('delivery-details') || '{}',
     );
     setDeliveryMethod(method || 'pickup');
+    if (method === 'ship') handleDistanceCalculations();
     setShippingDetails(shippingDetails);
   }, []);
 
@@ -147,7 +148,13 @@ const Cart = () => {
     setDeliveryFee(deliveryFee);
     setShippingDetails((old) => {
       const update = { ...old, address: loc?.address };
-      localStorage.setItem('delivery-details', JSON.stringify(update));
+      setDeliveryMethod((old) => {
+        localStorage.setItem(
+          'delivery-details',
+          JSON.stringify({ ...update, method: old }),
+        );
+        return old;
+      });
       return update;
     });
   };

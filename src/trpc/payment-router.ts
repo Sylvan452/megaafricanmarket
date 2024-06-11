@@ -206,6 +206,8 @@ export const paymentRouter = router({
           line_items,
         });
 
+        console.log('stripeSession', stripeSession);
+
         return { url: stripeSession.url };
       } catch (err) {
         console.error('Error creating Stripe session:', err);

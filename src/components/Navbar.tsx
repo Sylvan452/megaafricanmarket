@@ -65,7 +65,7 @@ const Navbar = async ({ searchParams }: { searchParams?: SearchParams }) => {
                       >
                         Create Account
                       </Link>
-                      <Cart />
+                      {/* <Cart /> */}
                     </>
                   ) : (
                     <>

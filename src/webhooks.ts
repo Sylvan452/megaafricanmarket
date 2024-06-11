@@ -8,6 +8,7 @@ import { Resend } from 'resend';
 import { ReceiptEmailHtml } from './components/emails/ReceiptEmail';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+// console.log
 
 export const stripeWebhookHandler = async (
   req: express.Request,
@@ -50,6 +51,21 @@ export const stripeWebhookHandler = async (
     if (!session?.metadata?.userId || !session?.metadata?.orderId) {
       return res.status(400).send(`Webhook Error: No user present in metadata`);
     }
+
+    const completedUpdate = await payload.update({
+      collection: 'orders',
+      data: {
+        paymentIntent: event.data.object.payment_intent as string,
+        // _isPaid: true,
+      },
+      where: {
+        id: {
+          equals: session.metadata.orderId,
+        },
+      },
+    });
+    console.log('checkout completed update', completedUpdate);
+
     const { docs: users } = await payload.find({
       collection: 'users',
       where: {
@@ -77,20 +93,6 @@ export const stripeWebhookHandler = async (
 
     if (!order) return res.status(404).json({ error: 'No such order exists.' });
 
-    const completedUpdate = await payload.update({
-      collection: 'orders',
-      data: {
-        paymentIntent: event.data.object.payment_intent as string,
-        // _isPaid: true,
-      },
-      where: {
-        id: {
-          equals: session.metadata.orderId,
-        },
-      },
-    });
-    console.log('checkout completed update', completedUpdate);
-
     // console.log('\n\nitems', order.items);
     // for (const product of order.products) {
     //   // const productDoc =
@@ -111,7 +113,7 @@ export const stripeWebhookHandler = async (
     // send receipt
     try {
       const data = await resend.emails.send({
-        from: 'DigitalHippo <info@megaafricanmarket.com>',
+        from: 'Mega African Market <info@megaafricanmarket.com>',
         to: [user.email],
         subject: 'Thanks for your order! This is your receipt.',
         html: ReceiptEmailHtml({
