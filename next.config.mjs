@@ -3,14 +3,16 @@ import myWebpackConfig from './webpack.config.js';
 
 const nextConfig = {
   images: {
-    remotePatterns: [
-      {
-        hostname: 'localhost',
-        pathname: '**',
-        port: '3000',
-        protocol: 'http',
-      },
-    ],
+    // remotePatterns: [
+    //   {
+    //     hostname: 'localhost',
+    //     pathname: '**',
+    //     port: '3000',
+    //     protocol: 'http',
+    //   },
+    // ],
+    loader: 'custom',
+    loaderFile: './loader.ts',
   },
   // webpack: (
   //   config,
