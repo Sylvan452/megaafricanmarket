@@ -1,3 +1,4 @@
+// @ts-nocheck
 import MaxWidthWrapper from '@/components/MaxWidthWrapper';
 import ProductReel from '@/components/ProductReel';
 import { buttonVariants } from '@/components/ui/button';

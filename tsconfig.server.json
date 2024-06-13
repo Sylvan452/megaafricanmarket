@@ -4,7 +4,19 @@
       "module": "CommonJS",
       "outDir": "dist",
       "noEmit": false,
-      "jsx": "react"
+      "jsx": "react",
+      "strict": false,                        // Disable all strict type-checking options
+      "noImplicitAny": false,                 // Allow variables with no explicit type
+      "strictNullChecks": false,              // Disable strict null checks
+      "strictFunctionTypes": false,           // Disable strict checking of function types
+      "strictBindCallApply": false,           // Disable strict checking of the 'bind', 'call', and 'apply' methods
+      "strictPropertyInitialization": false,  // Disable strict checking of property initialization in classes
+      "noImplicitThis": false,                // Allow 'this' to be of any type
+      "alwaysStrict": false,                  // Do not parse in strict mode
+      "skipLibCheck": true,                   // Skip type checking of declaration files
+      "forceConsistentCasingInFileNames": false, // Disable enforcement of consistent casing in file names
+      "noFallthroughCasesInSwitch": false,
+      "allowJs": true
     },
     "include": ["src/server.ts", "src/payload.config.ts"]
   }

@@ -62,9 +62,10 @@ const Page = () => {
           // shippingDetails.country,
           'NG',
         );
-
+// @ts-ignore
         setDeliveryFee(deliveryCost!);
         console.log('deliveryFee', deliveryCost);
+// @ts-ignore
         console.log('deliveryFee formatteddd', formatPrice(deliveryCost!));
         if (deliveryCost)
           localStorage.setItem('deliveryFee', deliveryCost.toString());

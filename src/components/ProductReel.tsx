@@ -20,7 +20,7 @@ const FALLBACK_LIMIT = 8;
 
 const ProductReel = (props: ProductReelProps) => {
   const { title, subtitle, href, query, isSearch } = props;
-  const [currentPage, setCurrentPage] = useState();
+  const [currentPage, setCurrentPage]: any = useState();
   useEffect(() => {
     console.log("current page", currentPage)
     setCurrentPage(1)
@@ -52,13 +52,13 @@ const ProductReel = (props: ProductReelProps) => {
 
   const handleNextPage = () => {
     // console.log("curr p in next",currentPage)
-    setCurrentPage((prevPage) => (prevPage || 1) + 1);
+    setCurrentPage((prevPage: any) => (prevPage || 1) + 1);
   };
 
   const handlePreviousPage = () => {
     // console.log("curr p in prev",currentPage)
     if (currentPage > 1) {
-      setCurrentPage((prevPage) => (prevPage || 2) - 1);
+      setCurrentPage((prevPage: any) => (prevPage || 2) - 1);
     }
   };
 

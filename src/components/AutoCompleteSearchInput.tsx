@@ -107,7 +107,7 @@ export default function AutoCompleteSearchInput() {
           }
           setQuery(string)
         }}
-        onSelect={(item) => {
+        onSelect={(item: any) => {
           // the item selected
           console.log("selected", item, (item && item?.id))
           if (item && item?.id) router.push(`/product/${item?.id}`)
