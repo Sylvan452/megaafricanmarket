@@ -24,7 +24,9 @@ const MyOrders: React.FC<MyOrdersProps> = ({ user, isOpen, onClose }) => {
   }, []);
 
   useEffect(() => {
+          console.log("in effect")
     if (isMounted) {
+          console.log("is mounted")
       const fetchOrders = async () => {
         try {
           const url = `/api/orders?user=${
@@ -42,7 +44,8 @@ const MyOrders: React.FC<MyOrdersProps> = ({ user, isOpen, onClose }) => {
           }
 
           const data = await response.json();
-          setOrders(data);
+          console.log("orders fetched", data)
+          setOrders(data.docs);
 
           const etag = response.headers.get('etag');
           if (etag) {
@@ -63,7 +66,7 @@ const MyOrders: React.FC<MyOrdersProps> = ({ user, isOpen, onClose }) => {
         <SheetHeader className="space-y-2.5 pr-6">
           <SheetTitle>My Orders</SheetTitle>
         </SheetHeader>
-        {orders.length > 0 ? (
+        {orders?.length > 0 ? (
           <>
             <div className="flex w-full flex-col pr-6">
               <ScrollArea className="h-96">

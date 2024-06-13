@@ -2,27 +2,27 @@ import Link from 'next/link';
 import MaxWidthWrapper from './MaxWidthWrapper';
 import NavItems from './NavItems';
 import Image from 'next/image';
-import { buttonVariants } from './ui/button';
+import {buttonVariants} from './ui/button';
 import dynamic from 'next/dynamic';
-import { cookies } from 'next/headers';
-import { getServerSideUser } from '@/lib/payload.utils';
+import {cookies} from 'next/headers';
+import {getServerSideUser} from '@/lib/payload.utils';
 import UserAccountNav from './UserAccountNav';
 import Cart from './Cart';
 import Wishlist from './Wishlist';
-import { Construction } from 'lucide-react';
-import AutoCompleteInput from './AutoCompleteInput';
+import {Construction} from 'lucide-react';
+import AutoCompleteSearchInput from './AutoCompleteSearchInput';
 
-const SearchBar = dynamic(() => import('./SearchBar'), { ssr: false });
-const MobileNav = dynamic(() => import('./MobileNav'), { ssr: false });
+const SearchBar = dynamic(() => import('./SearchBar'), {ssr: false});
+const MobileNav = dynamic(() => import('./MobileNav'), {ssr: false});
 
 interface SearchParams {
   query?: string;
 }
 
-const Navbar = async ({ searchParams }: { searchParams?: SearchParams }) => {
+const Navbar = async ({searchParams}: { searchParams?: SearchParams }) => {
   const query = searchParams?.query || '';
   const nextCookies = cookies();
-  const { user } = await getServerSideUser(nextCookies);
+  const {user} = await getServerSideUser(nextCookies);
   // console.log('user', user);
 
   return (
@@ -31,21 +31,23 @@ const Navbar = async ({ searchParams }: { searchParams?: SearchParams }) => {
         <MaxWidthWrapper>
           <div className="border-b border-gray-200">
             <div className="flex h-16 items-center">
-              <MobileNav user={user} />
+              <MobileNav user={user}/>
               <div className="ml-4 flex lg:ml-0">
                 <Link href="/">
-                  <Image src="/logo.png" alt="hero" width={80} height={80} />
+                  <Image src="/logo.png" alt="hero" width={80} height={80}/>
                 </Link>
               </div>
 
               <div className="hidden z-50 lg:ml-8 lg:block lg:self-stretch">
-                <NavItems />
+                <NavItems/>
               </div>
 
-              <div className="hidden lg:flex flex-1 mx-4">
-                <SearchBar />
+              {/*<div className="hidden lg:flex flex-1 mx-4">*/}
+              {/*  <SearchBar />*/}
+              {/*</div>*/}
+              <div className="flex flex-1 mx-4 ">
+                <AutoCompleteSearchInput/>
               </div>
-              <AutoCompleteInput />
 
               <div className="ml-auto flex items-center">
                 <div className="hidden lg:flex lg:flex-1 space-x-4 lg:items-center lg:justify-end lg:space-x-6">
@@ -53,7 +55,7 @@ const Navbar = async ({ searchParams }: { searchParams?: SearchParams }) => {
                     <>
                       <Link
                         href="/sign-in"
-                        className={buttonVariants({ variant: 'ghost' })}
+                        className={buttonVariants({variant: 'ghost'})}
                       >
                         Sign in
                       </Link>
@@ -63,20 +65,28 @@ const Navbar = async ({ searchParams }: { searchParams?: SearchParams }) => {
                       />
                       <Link
                         href="/sign-up"
-                        className={buttonVariants({ variant: 'ghost' })}
+                        className={buttonVariants({variant: 'ghost'})}
                       >
                         Create Account
                       </Link>
-                      <Cart />
+                      {/*<Cart />*/}
                     </>
                   ) : (
                     <>
-                      <UserAccountNav user={user} />
-                      <Cart />
-                      <Wishlist />
+                      <UserAccountNav user={user}/>
+                      <Cart/>
+                      <Wishlist/>
                     </>
                   )}
                 </div>
+                {user && (
+                  <div className="lg:hidden flex flex-1 space-x-2 lg:items-center lg:justify-end lg:space-x-6">
+                    <>
+                      <Cart />
+                      <Wishlist/>
+                    </>
+                  </div>
+                )}
               </div>
             </div>
           </div>

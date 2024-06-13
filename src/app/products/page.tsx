@@ -23,7 +23,7 @@ const Products = ({ searchParams }: ProductsPageProps) => {
   return (
     <MaxWidthWrapper>
       <ProductReel
-        title={label ?? 'Your Serach Prdoducts'}
+        title={label ?? 'Your Searched Prdoducts'}
         query={{
           category,
           limit: 40,

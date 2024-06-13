@@ -99,6 +99,48 @@ const start = async () => {
       res.status(500).json({ error: 'Failed to fetch orders' });
     }
   });
+  app.get('/api/search-products', async (req, res) => {
+    try {
+      const { docs: products } = await payload.find({
+        collection: 'products',
+        where: {
+          or: [
+            {
+              name: {
+                like: req.query.query,
+              },
+            },
+            {
+              category: {
+                like: req.query.query,
+              },
+            },
+            // {
+            //   brand: {
+            //     like: queryOpts.brand,
+            //   },
+            // },
+          ],
+        },
+        depth: 0,
+        // limit: 10,
+      });
+
+
+      // Disable caching
+      res.set(
+        'Cache-Control',
+        'no-store, no-cache, must-revalidate, proxy-revalidate',
+      );
+      res.set('Pragma', 'no-cache');
+      res.set('Expires', '0');
+      res.set('Surrogate-Control', 'no-store');
+
+      res.status(200).json(products);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch orders' });
+    }
+  });
   app.use((req, res) => nextHandler(req, res));
 
   nextApp.prepare().then(() => {

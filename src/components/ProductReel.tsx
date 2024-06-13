@@ -4,7 +4,7 @@ import { TQueryValidator } from '@/lib/validators/query-validator';
 import { Product } from '@/payload-types';
 import { trpc } from '@/trpc/client';
 import Link from 'next/link';
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import ProductListing from './ProductListing';
 import { boolean } from 'zod';
 
@@ -20,15 +20,20 @@ const FALLBACK_LIMIT = 8;
 
 const ProductReel = (props: ProductReelProps) => {
   const { title, subtitle, href, query, isSearch } = props;
-  const [currentPage, setCurrentPage] = useState(1);
-
+  const [currentPage, setCurrentPage] = useState();
+  useEffect(() => {
+    console.log("current page", currentPage)
+    setCurrentPage(1)
+  }, []);
   const { data: queryResults, isLoading } =
     trpc.getInfiniteProducts.useInfiniteQuery(
       {
         limit: query.limit ?? FALLBACK_LIMIT,
-        page: currentPage,
+        page: (currentPage) || 1,
+        // page: ,
+        // cursor: 2,
         query,
-        isSearch,
+        // isSearch,
       },
       {
         getNextPageParam: (lastPage) => lastPage.nextPage,
@@ -46,12 +51,14 @@ const ProductReel = (props: ProductReelProps) => {
   }
 
   const handleNextPage = () => {
-    setCurrentPage((prevPage) => prevPage + 1);
+    // console.log("curr p in next",currentPage)
+    setCurrentPage((prevPage) => (prevPage || 1) + 1);
   };
 
   const handlePreviousPage = () => {
+    // console.log("curr p in prev",currentPage)
     if (currentPage > 1) {
-      setCurrentPage((prevPage) => prevPage - 1);
+      setCurrentPage((prevPage) => (prevPage || 2) - 1);
     }
   };
 

@@ -90,7 +90,7 @@ export default function Home({
                   brand: query,
                 }}
                 isSearch={true}
-                title="Search Results"
+                title={`Search results for "${query}"`}
               />
             </MaxWidthWrapper>
           </div>
@@ -141,7 +141,7 @@ export default function Home({
             </div>
             <hr className="my-8 border-gray-300" />
             <ProductReel
-              query={{ sort: 'desc', limit: 8 }}
+              query={{ sort: '-createdAt', limit: 8 }}
               href="/products"
               title="Our Products"
             />

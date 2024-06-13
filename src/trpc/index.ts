@@ -21,8 +21,8 @@ export const appRouter = router({
       }),
     )
     .query(async ({ input }) => {
-      const { query, cursor, isSearch } = input;
-      const { sort, limit, ...queryOpts } = query;
+      const { query, cursor, isSearch, page: pageInput } = input;
+      const { sort, limit, page, ...queryOpts } = query;
 
       const payload = await getPayloadClient();
 
@@ -58,7 +58,8 @@ export const appRouter = router({
       //       like: queryOpts.brand!,
       //     };
       // })
-      const page = cursor || 1;
+      // const page = cursor || 1;
+      console.log("cursor, page", cursor, page)
 
       const {
         docs: items,
@@ -92,7 +93,7 @@ export const appRouter = router({
         sort,
         depth: 1,
         limit,
-        page,
+        page: page || pageInput || 1,
       });
 
       return {
