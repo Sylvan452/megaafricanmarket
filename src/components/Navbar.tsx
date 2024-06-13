@@ -10,6 +10,7 @@ import UserAccountNav from './UserAccountNav';
 import Cart from './Cart';
 import Wishlist from './Wishlist';
 import { Construction } from 'lucide-react';
+import AutoCompleteInput from './AutoCompleteInput';
 
 const SearchBar = dynamic(() => import('./SearchBar'), { ssr: false });
 const MobileNav = dynamic(() => import('./MobileNav'), { ssr: false });
@@ -44,6 +45,7 @@ const Navbar = async ({ searchParams }: { searchParams?: SearchParams }) => {
               <div className="hidden lg:flex flex-1 mx-4">
                 <SearchBar />
               </div>
+              <AutoCompleteInput />
 
               <div className="ml-auto flex items-center">
                 <div className="hidden lg:flex lg:flex-1 space-x-4 lg:items-center lg:justify-end lg:space-x-6">
@@ -65,7 +67,7 @@ const Navbar = async ({ searchParams }: { searchParams?: SearchParams }) => {
                       >
                         Create Account
                       </Link>
-                      {/* <Cart /> */}
+                      <Cart />
                     </>
                   ) : (
                     <>

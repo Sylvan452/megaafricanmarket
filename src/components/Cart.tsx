@@ -46,6 +46,7 @@ const Cart = () => {
     address: '',
     // apartment: '',
     city: '',
+    state: '',
     // zip: '',
     phone: '',
   });
@@ -251,6 +252,17 @@ const Cart = () => {
                             </select>
                           </div>
 
+                          <div>
+                            <label htmlFor="state">State</label>
+                            <input
+                              type="text"
+                              id="state"
+                              name="state"
+                              value={shippingDetails.state}
+                              onChange={handleShippingDetailChange}
+                              className="border p-1 w-full"
+                            />
+                          </div>
                           <div>
                             <label htmlFor="city">City</label>
                             <input
