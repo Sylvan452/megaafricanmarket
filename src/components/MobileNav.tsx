@@ -5,9 +5,6 @@ import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import SearchBar from './SearchBar';
-import Cart from './Cart';
-import Wishlist from './Wishlist';
 import UserAccountNav from './UserAccountNav';
 import { User } from '@/payload-types';
 
@@ -62,18 +59,35 @@ const MobileNav = ({ user }: MobileNavProps) => {
             </div>
 
             <div className="mt-2">
-              <div className="ml-4">
-                <SearchBar />
-                <div className="flex space-x-4 mt-2">
-                  <Cart />
-                  <Wishlist />
+              {!user && (
+                <div className="space-y-4 border-t border-gray-200 px-4 py-6">
+                  <div className="flow-root">
+                    <Link
+                      onClick={() => setIsOpen(false)}
+                      href="/sign-in"
+                      className="-m-2 block p-2 font-medium text-gray-900"
+                    >
+                      Sign in
+                    </Link>
+                  </div>
+                  <div className="flow-root">
+                    <Link
+                      onClick={() => setIsOpen(false)}
+                      href="/sign-up"
+                      className="-m-2 block p-2 font-medium text-gray-900"
+                    >
+                      Sign up
+                    </Link>
+                  </div>
                 </div>
-              </div>
+              )}
+
               {user && (
                 <div className="ml-4">
                   <UserAccountNav user={user} />
                 </div>
               )}
+
               <ul>
                 {PRODUCT_CATEGORIES.map((category) => (
                   <li key={category.label} className="space-y-1 px-4 pb-4 pt-6">
@@ -102,29 +116,6 @@ const MobileNav = ({ user }: MobileNavProps) => {
                 ))}
               </ul>
             </div>
-
-            {!user && (
-              <div className="space-y-4 border-t border-gray-200 px-4 py-6">
-                <div className="flow-root">
-                  <Link
-                    onClick={() => setIsOpen(false)}
-                    href="/sign-in"
-                    className="-m-2 block p-2 font-medium text-gray-900"
-                  >
-                    Sign in
-                  </Link>
-                </div>
-                <div className="flow-root">
-                  <Link
-                    onClick={() => setIsOpen(false)}
-                    href="/sign-up"
-                    className="-m-2 block p-2 font-medium text-gray-900"
-                  >
-                    Sign up
-                  </Link>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
