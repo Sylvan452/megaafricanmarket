@@ -4,7 +4,7 @@ import { TQueryValidator } from '@/lib/validators/query-validator';
 import { Product } from '@/payload-types';
 import { trpc } from '@/trpc/client';
 import Link from 'next/link';
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import ProductListing from './ProductListing';
 import { boolean } from 'zod';
 
@@ -22,14 +22,14 @@ const ProductReel = (props: ProductReelProps) => {
   const { title, subtitle, href, query, isSearch } = props;
   const [currentPage, setCurrentPage]: any = useState();
   useEffect(() => {
-    console.log("current page", currentPage)
-    setCurrentPage(1)
+    console.log('current page', currentPage);
+    setCurrentPage(1);
   }, []);
   const { data: queryResults, isLoading } =
     trpc.getInfiniteProducts.useInfiniteQuery(
       {
         limit: query.limit ?? FALLBACK_LIMIT,
-        page: (currentPage) || 1,
+        page: currentPage || 1,
         // page: ,
         // cursor: 2,
         query,
@@ -41,7 +41,7 @@ const ProductReel = (props: ProductReelProps) => {
     );
 
   const products = queryResults?.pages.flatMap((page) => page.items);
-  console.log(title, 'products', products);
+  // console.log(title, 'products', products);
   // console.log('query', query);
   let map: (Product | null)[] = [];
   if (products && products.length) {

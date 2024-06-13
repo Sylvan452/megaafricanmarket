@@ -65,11 +65,13 @@ const start = async () => {
 
   // Add new endpoint for fetching orders
   app.get('/api/orders', async (req, res) => {
+    console.log('orders req received');
     const userId = req.query.user;
 
     if (!userId) {
       return res.status(400).json({ error: 'User ID is required' });
     }
+    console.log('orders user', userId);
 
     try {
       const { docs: orders } = await payload.find({
@@ -79,20 +81,22 @@ const start = async () => {
             equals: userId,
           },
         },
+        sort: '-createdAt',
       });
 
       if (orders.length === 0) {
         return res.status(404).json({ error: 'No orders found for this user' });
       }
 
+      console.log('orders found', orders);
       // Disable caching
-      res.set(
-        'Cache-Control',
-        'no-store, no-cache, must-revalidate, proxy-revalidate',
-      );
-      res.set('Pragma', 'no-cache');
-      res.set('Expires', '0');
-      res.set('Surrogate-Control', 'no-store');
+      // res.set(
+      //   'Cache-Control',
+      //   'no-store, no-cache, must-revalidate, proxy-revalidate',
+      // );
+      // res.set('Pragma', 'no-cache');
+      // res.set('Expires', '0');
+      // res.set('Surrogate-Control', 'no-store');
 
       res.status(200).json(orders);
     } catch (error) {
@@ -125,7 +129,6 @@ const start = async () => {
         depth: 0,
         // limit: 10,
       });
-
 
       // Disable caching
       res.set(

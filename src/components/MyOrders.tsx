@@ -8,6 +8,7 @@ import { Separator } from './ui/separator';
 import Image from 'next/image';
 import OrderItem from './OrderItem';
 import { Order, User } from '@/payload-types';
+import axios from 'axios';
 
 interface MyOrdersProps {
   user: User;
@@ -24,30 +25,32 @@ const MyOrders: React.FC<MyOrdersProps> = ({ user, isOpen, onClose }) => {
   }, []);
 
   useEffect(() => {
-          console.log("in effect")
+    console.log('in effect');
     if (isMounted) {
-          console.log("is mounted")
+      console.log('is mounted');
       const fetchOrders = async () => {
         try {
           const url = `/api/orders?user=${
             user.id
           }&timestamp=${new Date().getTime()}`;
-          const response = await fetch(url, {
-            headers: {
-              'If-None-Match': localStorage.getItem('ordersEtag') || '',
-            },
+          console.log('fetching orders started.', url);
+          const response = await axios.get(url, {
+            // headers: {
+            //   'If-None-Match': localStorage.getItem('ordersEtag') || '',
+            // },
           });
 
+          console.log('orders response', response);
           if (response.status === 304) {
             console.log('No new data, using cached orders.');
-            return;
+            // return;
           }
 
-          const data = await response.json();
-          console.log("orders fetched", data)
+          const data = response.data;
+          console.log('orders fetched', data);
           setOrders(data.docs);
 
-          const etag = response.headers.get('etag');
+          const etag = response.headers['etag'];
           if (etag) {
             localStorage.setItem('ordersEtag', etag);
           }
