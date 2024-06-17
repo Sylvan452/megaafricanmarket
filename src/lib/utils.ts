@@ -107,8 +107,8 @@ export async function searchLocation(
   let res
   try{
     res = await axios({
-      method: 'post',
-      url: `https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0&${searchParam.toString()}&boundary.country=${countryCode}`,
+      method: 'get',
+      url: `/api/location/search?${searchParam.toString()}`,
       // url: `https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0&text=40%20Ajose%20Adeogun%20Abuja&boundary.country=NG`,
       headers: {
         Accept:
@@ -159,9 +159,9 @@ export async function searchAutocompleteLocations(
   let res;
   try {
     res = await axios({
-      method: 'post',
+      method: 'get',
       // url: `https://api.openrouteservice.org/geocode/autocomplete?api_key=5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0&${searchParam.toString()}&boundary.country=${countryCode}`,
-      url: `https://api.openrouteservice.org/geocode/autocomplete?api_key=5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0&${searchParam.toString()}&boundary.country=NG`,
+      url: `/api/location/search?${searchParam.toString()}`,
       headers: {
         Accept:
           'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
@@ -183,7 +183,7 @@ export async function searchAutocompleteLocations(
   );
   console.log('autocomplete result', result);
 
-  return result;
+  return result || [];
 }
 
 // searchLocation('Banex', 'Abuja', 'NG').then((res: Array<any>) => {
@@ -209,7 +209,7 @@ export async function getDeliverFeeForLocation(
 
   console.log('got location', loc);
 
-  if (!loc?.isConfident) return;
+  // if (!loc?.isConfident) return;
 
   const dist = await calcDistanceFrom(loc?.location);
   console.log('got dist', dist);

@@ -133,6 +133,7 @@ const Cart = () => {
 
   const handleDistanceCalculations = async () => {
     if (settingAddress) setTimeout(handleDistanceCalculations, 5000);
+    else return
     console.log('current shipping deet', shipingDeets);
     const loc = (
       await searchLocation(
@@ -145,7 +146,7 @@ const Cart = () => {
 
     console.log('got location', loc);
 
-    if (!loc?.isConfident) return;
+    // if (!loc?.isConfident) return;
 
     const dist = await calcDistanceFrom(loc?.location);
     console.log('got dist', dist);
@@ -335,7 +336,6 @@ const Cart = () => {
                               name="street"
                               value={shippingDetails.street}
                               onChange={handleShippingDetailChange}
-                              // onFocus={handleSettingAddress}
                               placeholder="Street name"
                             />
                           </div>
@@ -349,10 +349,10 @@ const Cart = () => {
                               name="unit"
                               value={shippingDetails.unit}
                               onChange={handleShippingDetailChange}
-                              // onFocus={handleSettingAddress}
+                              onFocus={handleSettingAddress}
                               onBlur={handleAddressSet}
                               className="border p-1 w-full"
-                              placeholder="House number, Apartment, suite, unit, etc. (optional)"
+                              placeholder="House number, Apartment, suite, unit, etc."
                               required
                             />
                           </div>
@@ -364,6 +364,7 @@ const Cart = () => {
                               id="zip"
                               name="zip"
                               // value={shippingDetails.zip}
+                              onFocus={handleSettingAddress}
                               onBlur={handleAddressSet}
                               onChange={handleShippingDetailChange}
                               className="border p-1 w-full"

@@ -23,7 +23,11 @@ export default function AutoCompleteInput({
 
   useEffect(() => {
     (async () => {
-      setItems(await getItems() || [])
+      const newItems = await getItems();
+      setItems(oldItems => {
+        if (!newItems?.length) return oldItems;
+        return newItems;
+      })
     })()
   }, [name, value]);
 
@@ -92,6 +96,7 @@ export default function AutoCompleteInput({
           }}>{item?.[otherProps?.resultStringKeyName] || item?.name}</span>
           // return item?.[otherProps?.resultStringKeyName] || item?.name
         }}
+        showNoResults={false}
         // className={"z-[-5px]"}
         // className={"bg-transparent"}
       />
