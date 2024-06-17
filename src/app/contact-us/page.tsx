@@ -11,7 +11,7 @@ const ContactUs = () => {
             <Phone className="text-red-600" />
           </div>
           <h3 className="mt-2">
-            <div>Call us</div> 1 (855) 699-8417
+            <div>Call us</div> 1 (443) 776 1887
           </h3>
         </div>
         <div className="flex flex-col items-center text-center">
@@ -19,7 +19,8 @@ const ContactUs = () => {
             <MapPin className="text-red-600" />
           </div>
           <h3 className="mt-2">
-            <div>Location:</div>1922 Choate Pkwy, #135, Celina TX, 75009.
+            <div>Location:</div>7214 B Windsor Mill Rd, Baltimore, Maryland
+            21244
           </h3>
         </div>
         <div className="flex flex-col items-center text-center">

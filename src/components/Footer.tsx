@@ -28,7 +28,10 @@ const Footer = () => {
               <a href="#" className="text-gray-600 hover:text-gray-800 ">
                 <FontAwesomeIcon icon={faTwitter} />
               </a>
-              <a href="#" className="text-gray-600 hover:text-gray-800">
+              <a
+                href="https://web.facebook.com/profile.php?id=61560480187389"
+                className="text-gray-600 hover:text-gray-800"
+              >
                 <FontAwesomeIcon icon={faFacebook} />
               </a>
               <a href="#" className="text-gray-600 hover:text-gray-800">
@@ -60,10 +63,10 @@ const Footer = () => {
                 </li>
                 <li>
                   <a
-                    href="/cookie-policy"
+                    href="/refund-policy"
                     className="text-gray-600 hover:text-gray-800"
                   >
-                    Cookie Policy
+                    Refund Policy
                   </a>
                 </li>
               </ul>

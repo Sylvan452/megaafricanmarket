@@ -2,7 +2,9 @@ const aboutus = () => {
   return (
     <div className="max-w-4xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold mb-8">About Us</h1>
-      <h3 className="text-xl">Welcome to Mega African Market</h3>
+
+      <div></div>
+      <h3 className="text-bold">Welcome to Mega African Market</h3>
       <p>
         Mega African Market is your one stop shop for the best, freshest, and
         cheapest African and carribian groceries in the United States.
@@ -11,7 +13,7 @@ const aboutus = () => {
         June 2024
       </p>
       <div></div>
-      <h3 className="text-xl">
+      <h3 className="text-bold">
         Your Online African and Carribian Grocery Solution
       </h3>
       <p>
@@ -21,7 +23,9 @@ const aboutus = () => {
         limited store hours - we deliver the market right to your door. Craving
         the in-person experience? Our stores are happy to welcome you too!
       </p>
-      <h3 className="text-xl">Quality and Variety Guaranteed</h3>
+
+      <div></div>
+      <h3 className="text-bold">Quality and Variety Guaranteed</h3>
       <p>
         As the leading online African Market in the US, Mega African Market
         promises the highest quality of African goods. We partner with trusted
@@ -30,7 +34,9 @@ const aboutus = () => {
         unique African produce, meats, and snacks, catering to diverse cultures
         including Nigeria, Ghana, Kenya, Senegal, Cameroon and many more
       </p>
-      <h3 className="text-xl">Shop with Ease and Convenience</h3>
+
+      <div></div>
+      <h3 className="text-bold">Shop with Ease and Convenience</h3>
       <p>
         Mega African Market transforms your grocery shopping experience. Save
         time and focus on what&apos;s important to you while we handle the rest.

@@ -102,7 +102,7 @@ export default function Home({
             <div className="flex flex-col md:flex-row">
               <div className="md:w-1/2 py-20 mx-auto text-center flex flex-col items-center max-w-3xl md:pr-12">
                 <h1 className="text-4xl font-bold tracking-tight text-gray-800 sm:text-5xl">
-                  Explore Your Ultimate One-Stop Shop for Quality{' '}
+                  Explore Your Ultimate One-Stop Shop for High Quality, Fresh{' '}
                   <span
                     style={{ display: 'inline' }}
                     className="text-green-700"
@@ -121,8 +121,10 @@ export default function Home({
                   <span className="text-red-600 text-xl">
                     Mega African Market:
                   </span>{' '}
-                  We Offer High-Quality and Fresh Ingredients for African &
-                  Caribbean Cuisine
+                  We Ship to all US states and Canada.
+                </p>
+                <p>
+                  For SNAP/EBT/ZELLE/CASH-APP Orders, Please call: 443 776 1887
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 mt-6">
                   <Link href="/product" className={buttonVariants()}>
