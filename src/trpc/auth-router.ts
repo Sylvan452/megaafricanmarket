@@ -113,7 +113,7 @@ export const authRouter = router({
   resetPassword: publicProcedure
     .input(ResetPasswordValidator)
     .mutation(async ({input}) => {
-      const {email, token, newPassword} = input;
+      const {token, newPassword} = input;
       const payload = await getPayloadClient();
 
       // Verify the reset token
@@ -129,15 +129,15 @@ export const authRouter = router({
       if (!isValidToken) throw new TRPCError({code: 'UNAUTHORIZED'});
 
       // Update the user's password
-      await payload.update({
-        collection: 'users',
-        where: {
-          email: {
-            equals: email,
-          },
-        },
-        data: {password: newPassword},
-      });
+      // await payload.update({
+      //   collection: 'users',
+      //   where: {
+      //     email: {
+      //       equals: email,
+      //     },
+      //   },
+      //   data: {password: newPassword},
+      // });
 
       return {success: true};
     }),

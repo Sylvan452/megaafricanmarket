@@ -13,7 +13,6 @@ export const QueryValidator = z.object({
 export type TQueryValidator = z.infer<typeof QueryValidator>;
 
 export const ResetPasswordValidator = z.object({
-  email: z.string().email(),
   token: z.string(),
   newPassword: z.string().min(6),
 });

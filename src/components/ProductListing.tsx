@@ -82,7 +82,7 @@ const ProductListing = ({
           <p className="mt-1 font-medium text-sm text-gray-900">
             {formatPrice(product?.price || 0)}
           </p>
-          {isLoggedIn && product && <AddToCartButton product={product} />}
+          {product && <AddToCartButton product={product} />}
         </div>
       </Link>
     </div>

@@ -21,7 +21,7 @@ import {useState} from "react";
 const ResetPasswordPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const token = searchParams.get('token');
   console.log('loaded1')
 
@@ -37,9 +37,12 @@ const ResetPasswordPage = () => {
     trpc.auth.resetPassword.useMutation({
       onSuccess: () => {
         toast.success('Password reset successfully');
+        router.replace("/sign-in");
       },
       onError: (err: any) => {
-        toast.error('Failed to reset password');
+        console.log("received err",err.message);
+        // console.log("received err",err);
+        toast.error(err.message || 'Failed to reset newPassword');
       },
     });
 
@@ -65,10 +68,12 @@ const ResetPasswordPage = () => {
             </h1>
           </div>
           <div className="grid gap-6">
-            <form onSubmit={(event) => {
-              console.log("submitting form", event.target)
-              // onSubmit()
-            }}>
+            <div
+            //   onSubmit={(event) => {
+            //   console.log("submitting form", event.target)
+            //   // onSubmit()
+            // }}
+            >
             {/*  <form onSubmit={handleSubmit(onSubmit)}>*/}
               <div className="grid gap-2">
                 <div className="grid gap-1 py-2">
@@ -77,14 +82,14 @@ const ResetPasswordPage = () => {
                     //{...register('newPassword')}
                     onChange={(event)=> {
                       console.log("value", event.target.value)
-                      setPassword(event.target.value);
+                      setNewPassword(event.target.value);
                     }}
                     type="password"
                     name="newPassword"
                     className={cn({
                       'focus-visible:ring-red-500': errors.newPassword,
                     })}
-                    value={password}
+                    value={newPassword}
                     placeholder="New Password"
                   />
                   {errors?.newPassword && (
@@ -98,8 +103,9 @@ const ResetPasswordPage = () => {
                   disabled={isLoading}
                   onClick={(event) => {
                     // onSubmit()
-                    console.log("submitting", password);
+                    console.log("submitting", newPassword);
                     console.log("submitting", event);
+                    onSubmit({newPassword})
                   }}
                 >
                   {isLoading && (
@@ -108,7 +114,7 @@ const ResetPasswordPage = () => {
                   Reset Password
                 </Button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>
