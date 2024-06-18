@@ -59,6 +59,15 @@ const MobileNav = ({ user }: MobileNavProps) => {
             </div>
 
             <div className="mt-2">
+              <div>
+                <Link
+                  onClick={() => setIsOpen(false)}
+                  href="/"
+                  className="block px-4 py-2 font-medium text-gray-900"
+                >
+                  Home
+                </Link>
+              </div>
               {!user && (
                 <div className="space-y-4 border-t border-gray-200 px-4 py-6">
                   <div className="flow-root">
