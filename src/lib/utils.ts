@@ -56,29 +56,33 @@ export const STORE_LOCATION: ILocation = {
 // };
 
 async function calcDistance(start: ILocation, end: ILocation) {
-  const res = await axios({
-    method: 'post',
-    url: 'https://api.openrouteservice.org/v2/directions/driving-car',
-    headers: {
-      Accept:
-        'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
-      Authorization: '5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0',
-      'Content-Type': 'application/json; charset=utf-8',
-    },
-    data: {
-      coordinates: [
-        [start.longitude, start.latitude],
-        [end.longitude, end.latitude],
-      ],
-      instructions: 'false',
-      suppress_warnings: 'true',
-      units: 'mi',
-      geometry: 'false',
-    },
-  });
+  try {
+    const res = await axios({
+      method: 'post',
+      url: 'https://api.openrouteservice.org/v2/directions/driving-car',
+      headers: {
+        Accept:
+          'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
+        Authorization: '5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0',
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      data: {
+        coordinates: [
+          [start.longitude, start.latitude],
+          [end.longitude, end.latitude],
+        ],
+        instructions: 'false',
+        suppress_warnings: 'true',
+        units: 'mi',
+        geometry: 'false',
+      },
+    });
 
-  console.log('calculated distance', res.data?.routes?.[0]?.summary?.distance);
-  return res.data?.routes?.[0]?.summary?.distance;
+    console.log('calculated distance', res.data?.routes?.[0]?.summary?.distance);
+    return res.data?.routes?.[0]?.summary?.distance;
+  } catch (err) {
+    console.log('err ocured calculating distance', err)
+  }
 }
 
 export async function calcDistanceFrom(destination: ILocation) {
@@ -108,7 +112,7 @@ export async function searchLocation(
   try {
     res = await axios({
       method: 'get',
-      url: `/api/location/search?${searchParam.toString()}`,
+      url: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/location/search?${searchParam.toString()}`,
       // url: `https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0&text=40%20Ajose%20Adeogun%20Abuja&boundary.country=NG`,
       headers: {
         Accept:
@@ -130,7 +134,7 @@ export async function searchLocation(
       };
       geometry: { coordinates: any[] };
     }) => ({
-      isConfident: f?.properties?.confidence >= 0.5,
+      isConfident: true || f?.properties?.confidence >= 0.5,
       address: f?.properties?.label,
       location: {
         longitude: f?.geometry?.coordinates?.[0],
@@ -162,7 +166,7 @@ export async function searchAutocompleteLocations(
     res = await axios({
       method: 'get',
       // url: `https://api.openrouteservice.org/geocode/autocomplete?api_key=5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0&${searchParam.toString()}&boundary.country=${countryCode}`,
-      url: `/api/location/search?${searchParam.toString()}`,
+      url: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/location/search?${searchParam.toString()}`,
       headers: {
         Accept:
           'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
@@ -249,7 +253,7 @@ export async function getDeliverDistForLocation(
 
   console.log('got location', loc);
 
-  if (!loc?.isConfident) return;
+  // if (!loc?.isConfident) return;
 
   const dist = await calcDistanceFrom(loc?.location);
   console.log('got dist', dist);
