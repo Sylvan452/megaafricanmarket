@@ -19,7 +19,8 @@ const AddToCartButton = ({ product }: { product: Product }) => {
 
   return (
     <Button
-      onClick={() => {
+      onClick={(event) => {
+        event.preventDefault()
         addItem(product);
         setIsSuccess(true);
       }}

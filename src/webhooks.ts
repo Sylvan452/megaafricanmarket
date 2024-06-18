@@ -1,11 +1,11 @@
 import express from 'express';
-import { WebhookRequest } from './server';
-import { stripe } from './lib/stripe';
+import {WebhookRequest} from './server';
+import {stripe} from './lib/stripe';
 import type Stripe from 'stripe';
-import { getPayloadClient } from './get-payload';
-import { Product } from './payload-types';
-import { Resend } from 'resend';
-import { ReceiptEmailHtml } from './components/emails/ReceiptEmail';
+import {getPayloadClient} from './get-payload';
+import {Product} from './payload-types';
+import {Resend} from 'resend';
+import {ReceiptEmailHtml} from './components/emails/ReceiptEmail';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 // console.log
@@ -14,19 +14,23 @@ export const stripeWebhookHandler = async (
   req: express.Request,
   res: express.Response,
 ) => {
+
+
   console.log('STRIPE WEBHOOK RECEIVED');
   // console.log();
   // console.log(req.body);
   console.log();
-  console.log(JSON.stringify(req.body, null, 2));
+  // console.log(JSON.stringify(req.body, null, 2));
   console.log();
-  console.log(req.headers);
+  // console.log(req.headers);
   console.log();
 
   const webhookRequest = req as any as WebhookRequest;
   const body = webhookRequest.rawBody;
   const signature = req.headers['stripe-signature'] || '';
-
+// console.log("stript web sec", process.env.STRIPE_WEBHOOK_SECRET)
+// console.log("stript sig", signature)
+// console.log("raw body", body)
   let event;
   try {
     event = stripe.webhooks.constructEvent(
@@ -35,21 +39,22 @@ export const stripeWebhookHandler = async (
       process.env.STRIPE_WEBHOOK_SECRET || '',
     );
   } catch (err) {
-    return res
-      .status(400)
-      .send(
-        `Webhook Error: ${
-          err instanceof Error ? err.message : 'Unknown Error'
-        }`,
-      );
+    res.sendStatus(200);
+    return console.log(
+      `Webhook Error: ${
+        err instanceof Error ? err.message : 'Unknown Error'
+      }`,
+    );
   }
 
   const session = event.data.object as Stripe.Checkout.Session;
 
   const payload = await getPayloadClient();
   if (event.type === 'checkout.session.completed') {
+    res.sendStatus(200);
+    console.log(JSON.stringify(req.body, null, 2));
     if (!session?.metadata?.userId || !session?.metadata?.orderId) {
-      return res.status(400).send(`Webhook Error: No user present in metadata`);
+      return console.log(`Webhook Error: No user present in metadata`);
     }
 
     const completedUpdate = await payload.update({
@@ -66,7 +71,11 @@ export const stripeWebhookHandler = async (
     });
     console.log('checkout completed update', completedUpdate);
 
-    const { docs: users } = await payload.find({
+    // if (completedUpdate.docs?.length && !completedUpdate?.errors?.length) {
+    //   res.sendStatus(200);
+    // } else res.sendStatus(400);
+
+    const {docs: users} = await payload.find({
       collection: 'users',
       where: {
         id: {
@@ -77,9 +86,9 @@ export const stripeWebhookHandler = async (
 
     const [user] = users;
 
-    if (!user) return res.status(404).json({ error: 'No such user exists.' });
+    if (!user) return console.log({error: 'No such user exists.'});
 
-    const { docs: orders } = await payload.find({
+    const {docs: orders} = await payload.find({
       collection: 'orders',
       depth: 2,
       where: {
@@ -91,7 +100,7 @@ export const stripeWebhookHandler = async (
 
     const [order] = orders;
 
-    if (!order) return res.status(404).json({ error: 'No such order exists.' });
+    if (!order) return console.log({error: 'No such order exists.'});
 
     // console.log('\n\nitems', order.items);
     // for (const product of order.products) {
@@ -109,7 +118,7 @@ export const stripeWebhookHandler = async (
     //     },
     //   })
     // }
-
+    console.log("about to send mail")
     // send receipt
     try {
       const data = await resend.emails.send({
@@ -123,25 +132,38 @@ export const stripeWebhookHandler = async (
           items: order.items as { product: Product; quantity?: number }[],
         }),
       });
-      res.status(200).json({ data });
+      console.log({data});
+      console.log("mail sent", data)
     } catch (error) {
-      res.status(500).json({ error });
+      console.log("err occured while sending mail", error)
+      console.log({error});
     }
+    return
   }
 
   if (event.type === 'charge.updated') {
+    console.log(JSON.stringify(req.body, null, 2));
     const isPaidUpdate = await payload.update({
       collection: 'orders',
       data: {
         _isPaid: event.data.object.paid,
       },
       where: {
-        paymentIntent: { equals: event.data.object.payment_intent as string },
+        paymentIntent: {equals: event.data.object.payment_intent as string},
       },
     });
-
+      console.log("isPaidUpdate.docs?.length", isPaidUpdate.docs?.length, "isPaidUpdate?.errors?.length", isPaidUpdate?.errors?.length)
+    if (isPaidUpdate.docs?.length && !isPaidUpdate?.errors?.length) {
+      console.log("marked as paid")
+      res.sendStatus(200);
+    } else {
+      console.log("not marked as paid")
+      res.sendStatus(400);
+    }
     console.log('paid update', isPaidUpdate);
+    return
   }
 
-  return res.status(200).send();
+  res.sendStatus(200);
+  return console.log();
 };
