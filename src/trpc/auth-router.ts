@@ -3,6 +3,7 @@ import { publicProcedure, router } from './trpc';
 import { getPayloadClient } from '../get-payload';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
+import { ResetPasswordValidator } from '@/lib/validators/query-validator';
 
 export const authRouter = router({
   createPayloadUser: publicProcedure
@@ -76,4 +77,66 @@ export const authRouter = router({
         throw new TRPCError({ code: 'UNAUTHORIZED' });
       }
     }),
+  passwordRecovery: publicProcedure
+    .input(z.object({ email: z.string().email() }))
+    .mutation(async ({ input }) => {
+      const { email } = input;
+      const payload = await getPayloadClient();
+
+      // Check if the user exists
+      const { docs: users } = await payload.find({
+        collection: 'users',
+        where: {
+          email: {
+            equals: email,
+          },
+        },
+      });
+
+      if (users.length === 0) throw new TRPCError({ code: 'NOT_FOUND' });
+
+      const user = users[0];
+
+      // Generate a password reset token
+      const resetToken = await payload.forgotPassword({
+        collection: 'users',
+        userId: user.id,
+      });
+
+      // Send password reset email
+      sendPasswordResetEmail(email, resetToken);
+
+      return { success: true, sentToEmail: email };
+    }),
+  resetPassword: publicProcedure
+    .input(ResetPasswordValidator)
+    .mutation(async ({ input }) => {
+      const { email, token, newPassword } = input;
+      const payload = await getPayloadClient();
+
+      // Verify the reset token
+      const isValidToken = await payload.verifyPasswordResetToken({
+        collection: 'users',
+        email,
+        token,
+      });
+
+      if (!isValidToken) throw new TRPCError({ code: 'UNAUTHORIZED' });
+
+      // Update the user's password
+      await payload.update({
+        collection: 'users',
+        where: {
+          email: {
+            equals: email,
+          },
+        },
+        data: { password: newPassword },
+      });
+
+      return { success: true };
+    }),
 });
+function sendPasswordResetEmail(email: string, resetToken: any) {
+  throw new Error('Function not implemented.');
+}

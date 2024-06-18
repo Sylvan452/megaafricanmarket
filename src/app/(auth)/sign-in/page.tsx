@@ -88,7 +88,7 @@ const Page = () => {
                   <Input
                     {...register('email')}
                     type="email"
-                    name="email" // Add name attribute
+                    name="email"
                     className={cn({
                       'focus-visible:ring-red-500': errors.email,
                     })}
@@ -106,7 +106,7 @@ const Page = () => {
                   <Input
                     {...register('password')}
                     type="password"
-                    name="password" // Add name attribute
+                    name="password"
                     className={cn({
                       'focus-visible:ring-red-500': errors.password,
                     })}
