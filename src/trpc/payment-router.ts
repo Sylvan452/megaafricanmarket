@@ -118,7 +118,7 @@ export const paymentRouter = router({
           filteredItems.map(({ product, quantity }) => {
             return {
               price: filterdProductsMap[product].priceId as string,
-              quantity,
+              quantity: quantity || 1,
               adjustable_quantity: {
                 enabled: true,
               },
@@ -145,24 +145,38 @@ export const paymentRouter = router({
               } catch (err) {
                 console.log('error while rereiving price', err);
               }
+              console.log(
+                'shipping deets',
+                shippingDeets?.address!,
+                shippingDeets?.city!,
+                shippingDeets?.country!,
+              );
+              let dist;
+              try {
+                dist = await getDeliverDistForLocation(
+                  shippingDeets?.address!,
+                  shippingDeets?.city!,
+                  shippingDeets?.country!,
+                );
+                console.log('dist calculated', dist);
+              } catch (err) {
+                console.log('err occurede while calculating distance\n', err);
+                throw err;
+              }
               line_items.push({
                 price: shippingPriceId,
                 quantity: (await (async () => {
                   try {
-                    const dist = await getDeliverDistForLocation(
-                      shippingDeets?.address!,
-                      shippingDeets?.city!,
-                      shippingDeets?.country!,
-                    );
-                    console.log('dist calculated', dist);
-                    if (dist && dist - 5 > 0) return Math.round(dist - 5);
+                    if (dist && dist - 5 > 0)
+                      return Math.round(dist - 5) || undefined;
+                    throw new Error('shipping dist less than 5 miles');
                   } catch (err) {
                     console.log(
                       'err occurede while calculating distance\n',
                       err,
                     );
+                    throw err;
                   }
-                  return 0;
                 })()!) as number,
                 // quantity: 1,
                 adjustable_quantity: {

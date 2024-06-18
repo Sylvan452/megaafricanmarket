@@ -1,5 +1,5 @@
-import {type ClassValue, clsx} from 'clsx';
-import {twMerge} from 'tailwind-merge';
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 // import axios from 'axios';
 const axios = require('axios');
@@ -15,7 +15,7 @@ export function formatPrice(
     notation?: Intl.NumberFormatOptions['notation'];
   } = {},
 ) {
-  const {currency = 'USD', notation = 'compact'} = options;
+  const { currency = 'USD', notation = 'compact' } = options;
 
   const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
 
@@ -104,8 +104,8 @@ export async function searchLocation(
   if (!countriesSet.has(countryCode)) countryCode = defaultCountryParam;
   const searchParam = new URLSearchParams();
   searchParam.append('text', `${address} ${city}`);
-  let res
-  try{
+  let res;
+  try {
     res = await axios({
       method: 'get',
       url: `/api/location/search?${searchParam.toString()}`,
@@ -113,13 +113,14 @@ export async function searchLocation(
       headers: {
         Accept:
           'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
-        Authorization: '5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0',
+        Authorization:
+          '5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0',
       },
     });
-  }catch{
-    return []
+  } catch (err) {
+    console.log('error searching location for', searchParam.toString(), err);
+    return [];
   }
-
 
   const result = res.data?.features?.map?.(
     (f: {
@@ -149,7 +150,7 @@ export async function searchAutocompleteLocations(
 ): Promise<
   Array<{ address: string; location: ILocation; isConfident: boolean }>
 > {
-  if (!place) return []
+  if (!place) return [];
   console.log('searching for', place);
   countryCode = defaultCountryParam;
   // if (!countriesSet.has(countryCode)) countryCode = defaultCountryParam;
@@ -165,20 +166,28 @@ export async function searchAutocompleteLocations(
       headers: {
         Accept:
           'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
-        Authorization: '5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0',
+        Authorization:
+          '5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0',
       },
     });
   } catch (err) {
-    console.log("error occurred while searching", err)
-    return []
+    console.log('error occurred while searching', err);
+    return [];
   }
   const result = res.data?.features?.map?.(
-    ({properties: {name, street, region, county, locality, label}}: {
+    ({
+      properties: { name, street, region, county, locality, label },
+    }: {
       properties: any;
       geometry: { coordinates: any[] };
     }) => ({
       id: name + street + region + county + locality + label,
-      name, street, region, county, locality, label
+      name,
+      street,
+      region,
+      county,
+      locality,
+      label,
     }),
   );
   console.log('autocomplete result', result);

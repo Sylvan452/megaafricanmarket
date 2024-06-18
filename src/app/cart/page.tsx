@@ -62,10 +62,10 @@ const Page = () => {
           // shippingDetails.country,
           'NG',
         );
-// @ts-ignore
+        // @ts-ignore
         setDeliveryFee(deliveryCost!);
         console.log('deliveryFee', deliveryCost);
-// @ts-ignore
+        // @ts-ignore
         console.log('deliveryFee formatteddd', formatPrice(deliveryCost!));
         if (deliveryCost)
           localStorage.setItem('deliveryFee', deliveryCost.toString());
@@ -112,6 +112,7 @@ const Page = () => {
     console.log('handling');
     const totalAmount = calculateTotalAmount();
     console.log('items', items);
+    console.log('shipping deets', shippingDeets);
     createCheckoutSession({
       items: items.map((item) => {
         // (item as any).product = item.product.id;
