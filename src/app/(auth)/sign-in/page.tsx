@@ -126,6 +126,17 @@ const Page = () => {
                   Sign in
                 </Button>
               </div>
+
+              <Link
+                className={buttonVariants({
+                  variant: 'link',
+                  className: 'gap-1.5',
+                })}
+                href="/password-recovery"
+              >
+                Forgot password
+                <ArrowRight className="h-4 w-4" />
+              </Link>
             </form>
 
             <div className="relative">

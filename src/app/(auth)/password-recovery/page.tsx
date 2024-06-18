@@ -26,7 +26,7 @@ const PasswordRecoveryPage = () => {
   });
 
   const { mutate: sendRecoveryEmail, isLoading } =
-    trpc.auth.sendPasswordRecoveryEmail.useMutation({
+    trpc.auth.passwordRecovery.useMutation({
       onSuccess: () => {
         toast.success('Recovery email sent successfully');
       },

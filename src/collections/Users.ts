@@ -6,13 +6,24 @@ export const Users: CollectionConfig = {
   auth: {
     verify: {
       generateEmailHTML: ({ token }) => {
+        console.log("verify email, generation")
         return PrimaryActionEmailHtml({
-          actionLabel: 'verify your account',
-          buttonText: 'Verify Account',
+          actionLabel: 'Verify Your Account',
+          buttonText: 'Verify Your Account',
           href: `${process.env.NEXT_PUBLIC_SERVER_URL}/verify-email?token=${token}`,
         });
       },
     },
+    forgotPassword: {
+      generateEmailHTML: ({ req, token, user }) => {
+        console.log("forgot password, generation")
+        return PrimaryActionEmailHtml({
+          actionLabel: 'Reset Your Password',
+          buttonText: 'Reset Password',
+          href: `${process.env.NEXT_PUBLIC_SERVER_URL}/change-password?token=${token}`,
+        })
+      },
+    }
   },
   access: {
     read: () => true,

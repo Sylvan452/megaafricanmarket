@@ -1,35 +1,39 @@
-'use client';
+"use client";
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useSearchParams } from 'next/navigation';
+import {useForm} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {useRouter, useSearchParams} from 'next/navigation';
 import Link from 'next/link';
-import { Button, buttonVariants } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
-import { trpc } from '@/trpc/client';
+import {Button, buttonVariants} from '@/components/ui/button';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
+import {cn} from '@/lib/utils';
+import {toast} from 'sonner';
+import {trpc} from '@/trpc/client';
 import {
   ResetPasswordValidator,
   TResetPasswordValidator,
 } from '@/lib/validators/reset-password-validator';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import {ArrowRight, Loader2} from 'lucide-react';
 import Image from 'next/image';
+import {useState} from "react";
 
 const ResetPasswordPage = () => {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const [password, setPassword] = useState("");
   const token = searchParams.get('token');
+  console.log('loaded1')
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: {errors},
   } = useForm<TResetPasswordValidator>({
     resolver: zodResolver(ResetPasswordValidator),
   });
 
-  const { mutate: resetPassword, isLoading } =
+  const {mutate: resetPassword, isLoading} =
     trpc.auth.resetPassword.useMutation({
       onSuccess: () => {
         toast.success('Password reset successfully');
@@ -39,12 +43,13 @@ const ResetPasswordPage = () => {
       },
     });
 
-  const onSubmit = ({ newPassword }: TResetPasswordValidator) => {
+  const onSubmit = ({newPassword}: TResetPasswordValidator) => {
+    console.log("submitting")
     if (!token) {
       toast.error('Invalid or expired token');
       return;
     }
-    resetPassword({ token, newPassword });
+    resetPassword({token, newPassword});
   };
 
   return (
@@ -53,24 +58,33 @@ const ResetPasswordPage = () => {
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <div className="flex flex-col items-center space-y-2 text-center">
             <Link href="/">
-              <Image src="/logo.png" alt="hero" width={140} height={70} />
+              <Image src="/logo.png" alt="hero" width={140} height={70}/>
             </Link>
             <h1 className="text-2xl font-semibold tracking-tight">
               Reset Password
             </h1>
           </div>
           <div className="grid gap-6">
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={(event) => {
+              console.log("submitting form", event.target)
+              // onSubmit()
+            }}>
+            {/*  <form onSubmit={handleSubmit(onSubmit)}>*/}
               <div className="grid gap-2">
                 <div className="grid gap-1 py-2">
-                  <Label htmlFor="password">New Password</Label>
+                  <Label htmlFor="newPassword">New Password</Label>
                   <Input
-                    {...register('newPassword')}
+                    //{...register('newPassword')}
+                    onChange={(event)=> {
+                      console.log("value", event.target.value)
+                      setPassword(event.target.value);
+                    }}
                     type="password"
-                    name="password"
+                    name="newPassword"
                     className={cn({
                       'focus-visible:ring-red-500': errors.newPassword,
                     })}
+                    value={password}
                     placeholder="New Password"
                   />
                   {errors?.newPassword && (
@@ -79,9 +93,17 @@ const ResetPasswordPage = () => {
                     </p>
                   )}
                 </div>
-                <Button type="submit" disabled={isLoading}>
+                <Button
+                  type="button"
+                  disabled={isLoading}
+                  onClick={(event) => {
+                    // onSubmit()
+                    console.log("submitting", password);
+                    console.log("submitting", event);
+                  }}
+                >
                   {isLoading && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
                   )}
                   Reset Password
                 </Button>
