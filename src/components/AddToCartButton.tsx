@@ -12,7 +12,7 @@ const AddToCartButton = ({ product }: { product: Product }) => {
   useEffect(() => {
     const timeout = setTimeout(() => {
       setIsSuccess(false);
-    }, 2000);
+    }, 20000);
 
     return () => clearTimeout(timeout);
   }, [isSuccess]);
@@ -20,14 +20,14 @@ const AddToCartButton = ({ product }: { product: Product }) => {
   return (
     <Button
       onClick={(event) => {
-        event.preventDefault()
+        event.preventDefault();
         addItem(product);
         setIsSuccess(true);
       }}
       size="lg"
       className="w-full"
     >
-      {isSuccess ? 'Added!' : 'Add to cart'}
+      {isSuccess ? 'View in cart!' : 'Add to cart'}
     </Button>
   );
 };

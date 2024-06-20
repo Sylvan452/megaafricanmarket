@@ -55,7 +55,7 @@ export interface Product {
     | 'meat_chicken_fish'
     | 'frozen_food_vegetable'
     | 'canned_products'
-    | 'spices'
+    | 'spices_seasonings'
     | 'oil'
     | 'flour'
     | 'dried_seeds_leaves'
@@ -183,7 +183,6 @@ export interface PayloadMigration {
   updatedAt: string;
   createdAt: string;
 }
-
 
 declare module 'payload' {
   export interface GeneratedTypes extends Config {}

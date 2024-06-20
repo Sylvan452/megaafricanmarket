@@ -34,7 +34,10 @@ const Footer = () => {
               >
                 <FontAwesomeIcon icon={faFacebook} />
               </a>
-              <a href="#" className="text-gray-600 hover:text-gray-800">
+              <a
+                href="https://www.instagram.com/megaintlafricanfood"
+                className="text-gray-600 hover:text-gray-800"
+              >
                 <FontAwesomeIcon icon={faInstagram} />
               </a>
             </span>

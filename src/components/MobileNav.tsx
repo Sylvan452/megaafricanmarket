@@ -45,7 +45,7 @@ const MobileNav = ({ user }: MobileNavProps) => {
         <div className="fixed inset-0 bg-black bg-opacity-25" />
       </div>
 
-      <div className="fixed overflow-y-scroll overscroll-y-none inset-0 z-40 flex">
+      <div className="fixed overflow-y-scroll inset-0 z-40 flex">
         <div className="w-4/5">
           <div className="relative flex w-full max-w-sm flex-col overflow-y-auto bg-white pb-12 shadow-xl">
             <div className="flex px-4 pb-2 pt-5">
@@ -114,6 +114,7 @@ const MobileNav = ({ user }: MobileNavProps) => {
                           <div className="group-hover:opacity-75"></div>
                           <Link
                             href={item.href}
+                            onClick={() => setIsOpen(false)} // Close menu on click
                             className="mt-4 block font-medium text-gray-900"
                           >
                             {item.name}
@@ -127,6 +128,8 @@ const MobileNav = ({ user }: MobileNavProps) => {
             </div>
           </div>
         </div>
+        {/* Add an empty div for the remaining space to close the menu when clicked */}
+        <div className="w-1/5" onClick={() => setIsOpen(false)} />
       </div>
     </div>
   );

@@ -25,8 +25,8 @@ export const PRODUCT_CATEGORIES = [
     value: 'canned_products',
   },
   {
-    label: 'Spices',
-    value: 'spices',
+    label: 'Spices/Seasonings',
+    value: 'spices_seasonings',
   },
   {
     label: 'Oil',

@@ -23,7 +23,7 @@ const perks = [
     name: 'Instant Delivery',
     Icon: Truck,
     description:
-      'Enjoy free delivery to your doorstep within 5-mile.<br />For distances beyond 5 miles, a fee of 50 cents per mile applies.',
+      'Enjoy free delivery to your doorstep within 5-mile.<br />For distances beyond 5 miles, a fee of 50 cents per mile applies.<br /> Order online and pick up in 1 hour',
   },
   {
     name: 'Guaranteed Quality',
@@ -35,7 +35,7 @@ const perks = [
     name: 'How to Shop',
     Icon: ShoppingBag,
     description:
-      'Browse through the collection on our website.<br />Walk into our store during operational hours.<br />Call or text our sales team to place an order.',
+      'Browse through the collection on our website.<br />Walk into our store during operational hours.<br />Call or text our sales team to place an order.<br /> Massive discount for large purchases',
   },
 ];
 
@@ -119,7 +119,7 @@ export default function Home({
                 <p className="mt-6 text-lg max-w-prose text-muted-foreground">
                   Welcome to{' '}
                   <span className="text-red-600 text-xl">
-                    Mega African Market:
+                    Mega Int'l African % Caribbean Market:
                   </span>{' '}
                   We Ship to all US states and Canada.
                 </p>

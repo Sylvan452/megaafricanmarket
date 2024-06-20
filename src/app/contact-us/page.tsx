@@ -14,8 +14,8 @@ const ContactUs = () => {
             <div>Call us</div> 1 (443) 776 1887
           </h3>
           <h3>
-            <div>We operate Monday-Saturday 7am - 9pm</div>
-            <div>Synday 8am - 8pm</div>
+            <div>We open Monday-Saturday 7am - 9pm</div>
+            <div>Sunday 8am - 8pm</div>
           </h3>
         </div>
         <div className="flex flex-col items-center text-center">
