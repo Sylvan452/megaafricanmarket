@@ -10,23 +10,23 @@ dotenv.config({
     path: path.resolve(__dirname, '../.env'),
   })
 
-  // const transporter = nodemailer.createTransport({
-  //   host: 'smtp.resend.com',
-  //   secure: true,
-  //   port: 465,
-  //   auth: {
-  //     user: 'resend',
-  //     pass: process.env.RESEND_API_KEY,
-  //   },
-  // })
-
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: 'smtp.resend.com',
+    secure: true,
+    port: 465,
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user: 'resend',
+      pass: process.env.RESEND_API_KEY,
     },
   })
+
+  // const transporter = nodemailer.createTransport({
+  //   service: "gmail",
+  //   auth: {
+  //     user: process.env.SMTP_USER,
+  //     pass: process.env.SMTP_PASS,
+  //   },
+  // })
 
 let cached = (global as any).payload
 
