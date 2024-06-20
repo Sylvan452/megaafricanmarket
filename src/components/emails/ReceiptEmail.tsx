@@ -1,6 +1,5 @@
 import { formatPrice } from '../../lib/utils';
 import { Order, Product } from '../../payload-types';
-
 import {
   Body,
   Container,
@@ -16,9 +15,7 @@ import {
   Text,
   render,
 } from '@react-email/components';
-
 import * as React from 'react';
-
 import { format } from 'date-fns';
 
 interface ReceiptEmailProps {
@@ -36,7 +33,13 @@ export const ReceiptEmail = ({
   order,
   items,
 }: ReceiptEmailProps) => {
-  const total = items.reduce((acc, curr) => acc + curr.product.price, 0) + 1;
+  const itemsTotal = items.reduce(
+    (acc, curr) => acc + curr.product.price * (curr.quantity || 1),
+    0,
+  );
+  const transactionFee = 1;
+  const total = itemsTotal + transactionFee;
+  const shippingFee = order.totalAmount - itemsTotal - transactionFee;
 
   return (
     <Html>
@@ -94,7 +97,7 @@ export const ReceiptEmail = ({
           <Section style={productTitleTable}>
             <Text style={productsTitle}>Order Summary</Text>
           </Section>
-          {items.map(({ product }) => {
+          {items.map(({ product, quantity }) => {
             const { image } = product.images[0];
 
             return (
@@ -122,13 +125,15 @@ export const ReceiptEmail = ({
                 </Column>
 
                 <Column style={productPriceWrapper} align="right">
-                  <Text style={productPrice}>{formatPrice(product.price)}</Text>
+                  <Text style={productPrice}>
+                    {formatPrice(product.price * (quantity || 1))}
+                  </Text>
                 </Column>
               </Section>
             );
           })}
 
-          {order?.deliveryMethod == 'ship' ? (
+          {order?.deliveryMethod === 'ship' ? (
             <Section>
               <Column style={{ width: '64px' }}></Column>
               <Column
@@ -141,9 +146,7 @@ export const ReceiptEmail = ({
               </Column>
 
               <Column style={productPriceWrapper} align="right">
-                <Text style={productPrice}>
-                  {formatPrice(order.totalAmount - total - 1)}
-                </Text>
+                <Text style={productPrice}>{formatPrice(shippingFee)}</Text>
               </Column>
             </Section>
           ) : null}
@@ -159,7 +162,7 @@ export const ReceiptEmail = ({
             </Column>
 
             <Column style={productPriceWrapper} align="right">
-              <Text style={productPrice}>{formatPrice(1)}</Text>
+              <Text style={productPrice}>{formatPrice(transactionFee)}</Text>
             </Column>
           </Section>
 
@@ -170,7 +173,9 @@ export const ReceiptEmail = ({
             </Column>
             <Column style={productPriceVerticalLine}></Column>
             <Column style={productPriceLargeWrapper}>
-              <Text style={productPriceLarge}>{formatPrice(total)}</Text>
+              <Text style={productPriceLarge}>
+                {formatPrice(order.totalAmount)}
+              </Text>
             </Column>
           </Section>
           <Hr style={productPriceLineBottom} />
