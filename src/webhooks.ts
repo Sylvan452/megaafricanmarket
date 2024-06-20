@@ -52,7 +52,9 @@ export const stripeWebhookHandler = async (
   const payload = await getPayloadClient();
   if (event.type === 'checkout.session.completed') {
     res.sendStatus(200);
-    console.log(JSON.stringify(req.body, null, 2));
+    // console.log(JSON.stringify(req.body, null, 2));
+    console.log("even type", event.type);
+    console.log("payment intent", event.data.object.payment_intent);
     if (!session?.metadata?.userId || !session?.metadata?.orderId) {
       return console.log(`Webhook Error: No user present in metadata`);
     }
@@ -141,29 +143,112 @@ export const stripeWebhookHandler = async (
     return
   }
 
-  if (event.type === 'charge.updated') {
-    console.log(JSON.stringify(req.body, null, 2));
-    const isPaidUpdate = await payload.update({
-      collection: 'orders',
-      data: {
-        _isPaid: event.data.object.paid,
-      },
-      where: {
-        paymentIntent: {equals: event.data.object.payment_intent as string},
-      },
-    });
-      console.log("isPaidUpdate.docs?.length", isPaidUpdate.docs?.length, "isPaidUpdate?.errors?.length", isPaidUpdate?.errors?.length)
-    if (isPaidUpdate.docs?.length && !isPaidUpdate?.errors?.length) {
-      console.log("marked as paid")
-      res.sendStatus(200);
-    } else {
-      console.log("not marked as paid")
-      res.sendStatus(400);
-    }
-    console.log('paid update', isPaidUpdate);
+  if (event.type === 'charge.succeeded') {
+  // if (event.type === 'charge.updated') {
+    res.sendStatus(200);
+    // console.log(JSON.stringify(req.body, null, 2));
+    console.log("even type", event.type);
+    console.log("payment intent", event.data.object.payment_intent);
+
+    
+    markOrderAsPaid(event, payload)
+    // const isPaidUpdate = await payload.update({
+    //   collection: 'orders',
+    //   data: {
+    //     _isPaid: event.data.object.paid,
+    //   },
+    //   where: {
+    //     paymentIntent: {equals: event.data.object.payment_intent as string},
+    //   },
+    // });
+    //   console.log("isPaidUpdate.docs?.length", isPaidUpdate.docs?.length, "isPaidUpdate?.errors?.length", isPaidUpdate?.errors?.length)
+    // if (isPaidUpdate.docs?.length && !isPaidUpdate?.errors?.length) {
+    //   console.log("marked as paid")
+    // } else {
+    //   console.log("not marked as paid")
+    //   setTimeout(() => {
+
+    //   }, 10_000)
+    // }
+    // console.log('paid update', isPaidUpdate);
     return
   }
 
+  // if (event.type === 'charge.succeeded') {
+  //   // console.log(JSON.stringify(req.body, null, 2));
+  //   console.log("even type", event.type);
+  //   console.log("payment intent", event.data.object.payment_intent);
+  //   console.log("is paid", event.data.object.paid);
+  //   const isPaidUpdate = await payload.update({
+  //     collection: 'orders',
+  //     data: {
+  //       _isPaid: event.data.object.paid,
+  //     },
+  //     where: {
+  //       paymentIntent: {equals: event.data.object.payment_intent as string},
+  //     },
+  //   });
+  //   console.log("isPaidUpdate.docs?.length", isPaidUpdate.docs?.length, "isPaidUpdate?.errors?.length", isPaidUpdate?.errors?.length)
+  //   if (isPaidUpdate.docs?.length && !isPaidUpdate?.errors?.length) {
+  //     console.log("marked as paid")
+  //     res.sendStatus(200);
+  //   } else {
+  //     console.log("not marked as paid")
+  //     res.sendStatus(400);
+  //   }
+  //   console.log('paid update', isPaidUpdate);
+  //   return
+  // }
+
+  // if (event.type === 'payment_intent.succeeded') {
+  //   // console.log(JSON.stringify(req.body, null, 2));
+  //   console.log("even type", event.type);
+  //   console.log("payment intent", event.data.object.id);
+  //   console.log("is paid", event.data.object.paid);
+  //   const isPaidUpdate = await payload.update({
+  //     collection: 'orders',
+  //     data: {
+  //       _isPaid: event.data.object.paid,
+  //     },
+  //     where: {
+  //       paymentIntent: {equals: event.data.object.payment_intent as string},
+  //     },
+  //   });
+  //   console.log("isPaidUpdate.docs?.length", isPaidUpdate.docs?.length, "isPaidUpdate?.errors?.length", isPaidUpdate?.errors?.length)
+  //   if (isPaidUpdate.docs?.length && !isPaidUpdate?.errors?.length) {
+  //     console.log("marked as paid")
+  //     res.sendStatus(200);
+  //   } else {
+  //     console.log("not marked as paid")
+  //     res.sendStatus(400);
+  //   }
+  //   console.log('paid update', isPaidUpdate);
+  //   return
+  // }
+
+  console.log("even type", event.type, "ignored");
   res.sendStatus(200);
   return console.log();
 };
+
+async function markOrderAsPaid(event: any, payload:any,) {
+  const isPaidUpdate = await payload.update({
+    collection: 'orders',
+    data: {
+      _isPaid: event.data.object.paid,
+    },
+    where: {
+      paymentIntent: {equals: event.data.object.payment_intent as string},
+    },
+  });
+    console.log("isPaidUpdate.docs?.length", isPaidUpdate.docs?.length, "isPaidUpdate?.errors?.length", isPaidUpdate?.errors?.length)
+  if (isPaidUpdate.docs?.length && !isPaidUpdate?.errors?.length) {
+    console.log("marked as paid")
+  } else {
+    console.log("not marked as paid, would retry next 5 seconds")
+    setTimeout(() => {
+      markOrderAsPaid(event, payload)
+    }, 5_000)
+  }
+  console.log('paid update', isPaidUpdate);
+}

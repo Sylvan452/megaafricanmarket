@@ -41,6 +41,7 @@ export default buildConfig({
   editor,
   db: mongooseAdapter({
     url: process.env.MONGODB_URL!,
+    transactionOptions: false,
   }),
   typescript: {
     outputFile: path.resolve(__dirname, 'payload-types.ts'),
