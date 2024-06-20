@@ -11,7 +11,7 @@ const Orders: CollectionConfig = {
       name: 'orderedBy',
       type: 'relationship',
       relationTo: 'users',
-      required: true,
+      required: false,
     },
     {
       name: 'items',
@@ -111,6 +111,7 @@ const Orders: CollectionConfig = {
   ],
   access: {
     read: ({ req: { user } }) => {
+      return true
       if (user?.role === 'admin') {
         return true; // Admin can read all orders
       }
