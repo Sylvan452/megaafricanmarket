@@ -21,12 +21,12 @@ interface PageProps {
 
 const ThankYouPage = async ({ searchParams }: PageProps) => {
   const orderId = searchParams.orderId;
-  const nextCookies = cookies();
+  // const nextCookies = cookies();
 
-  const { user } = await getServerSideUser(nextCookies);
+  // const { user } = await getServerSideUser(nextCookies);
   const payload = await getPayloadClient();
 
-  console.log('\n\nlogged', orderId, user?.id);
+  // console.log('\n\nlogged', orderId, user?.id);
 
   const { docs: orders } = await payload.find({
     collection: 'orders',
@@ -44,10 +44,10 @@ const ThankYouPage = async ({ searchParams }: PageProps) => {
 
   const orderUserId =
     typeof order.orderedBy === 'string' ? order.orderedBy : order.orderedBy?.id; // Add optional chaining
-  console.log('\n\nlogged', order, orderId, orderUserId, user?.id);
-  if (!orderUserId || orderUserId !== user?.id) {
-    return redirect(`/sign-in?origin=thank-you&orderId=${order.id}`);
-  }
+  // console.log('\n\nlogged', order, orderId, orderUserId, user?.id);
+  // if (!orderUserId || orderUserId !== user?.id) {
+  //   return redirect(`/sign-in?origin=thank-you&orderId=${order.id}`);
+  // }
 
   const products = order.items.map(({ product }) => product) as Product[];
   console.log('prods', products);

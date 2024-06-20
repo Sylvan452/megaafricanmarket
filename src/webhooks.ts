@@ -51,9 +51,9 @@ export const stripeWebhookHandler = async (
     // console.log(JSON.stringify(req.body, null, 2));
     console.log('even type', event.type);
     console.log('payment intent', event.data.object.payment_intent);
-    if (!session?.metadata?.userId || !session?.metadata?.orderId) {
-      return console.log(`Webhook Error: No user present in metadata`);
-    }
+    // if (!session?.metadata?.userId || !session?.metadata?.orderId) {
+    //   return console.log(`Webhook Error: No user present in metadata`);
+    // }
 
     const completedUpdate = await payload.update({
       collection: 'orders',
@@ -73,18 +73,18 @@ export const stripeWebhookHandler = async (
     //   res.sendStatus(200);
     // } else res.sendStatus(400);
 
-    const { docs: users } = await payload.find({
-      collection: 'users',
-      where: {
-        id: {
-          equals: session.metadata.userId,
-        },
-      },
-    });
+    // const { docs: users } = await payload.find({
+    //   collection: 'users',
+    //   where: {
+    //     id: {
+    //       equals: session.metadata.userId,
+    //     },
+    //   },
+    // });
 
-    const [user] = users;
+    // const [user] = users;
 
-    if (!user) return console.log({ error: 'No such user exists.' });
+    // if (!user) return console.log({ error: 'No such user exists.' });
 
     const { docs: orders } = await payload.find({
       collection: 'orders',
@@ -121,11 +121,11 @@ export const stripeWebhookHandler = async (
     try {
       const data = await resend.emails.send({
         from: 'Mega African Market <info@megaafricanmarket.com>',
-        to: [user.email],
+        to: [event.data.object.customer_details.email],
         subject: 'Thanks for your order! This is your receipt.',
         html: ReceiptEmailHtml({
           date: new Date(),
-          email: user.email,
+          email: event.data.object.customer_details.email,
           order,
           orderId: session.metadata.orderId,
           items: order.items as { product: Product; quantity?: number }[],
