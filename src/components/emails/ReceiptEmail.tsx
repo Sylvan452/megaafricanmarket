@@ -1,5 +1,5 @@
 import { formatPrice } from '../../lib/utils';
-import { Product } from '../../payload-types';
+import { Order, Product } from '../../payload-types';
 
 import {
   Body,
@@ -25,6 +25,7 @@ interface ReceiptEmailProps {
   email: string;
   date: Date;
   orderId: string;
+  order: Order;
   items: { product: Product; quantity?: number }[];
 }
 
@@ -32,6 +33,7 @@ export const ReceiptEmail = ({
   email,
   date,
   orderId,
+  order,
   items,
 }: ReceiptEmailProps) => {
   const total = items.reduce((acc, curr) => acc + curr.product.price, 0) + 1;
@@ -126,6 +128,25 @@ export const ReceiptEmail = ({
             );
           })}
 
+          {order?.deliveryMethod == 'ship' ? (
+            <Section>
+              <Column style={{ width: '64px' }}></Column>
+              <Column
+                style={{
+                  paddingLeft: '40px',
+                  paddingTop: 20,
+                }}
+              >
+                <Text style={productTitle}>Shipping Fee</Text>
+              </Column>
+
+              <Column style={productPriceWrapper} align="right">
+                <Text style={productPrice}>
+                  {formatPrice(order.totalAmount - total - 1)}
+                </Text>
+              </Column>
+            </Section>
+          ) : null}
           <Section>
             <Column style={{ width: '64px' }}></Column>
             <Column
