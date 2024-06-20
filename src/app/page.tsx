@@ -119,7 +119,7 @@ export default function Home({
                 <p className="mt-6 text-lg max-w-prose text-muted-foreground">
                   Welcome to{' '}
                   <span className="text-red-600 text-xl">
-                    Mega Int'l African % Caribbean Market:
+                    Mega Int'l African/Caribbean Market:
                   </span>{' '}
                   We Ship to all US states and Canada.
                 </p>
