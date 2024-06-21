@@ -1,10 +1,10 @@
 'use client';
 
-import React, {useCallback, useEffect, useState} from 'react';
-import {ShoppingCart} from 'lucide-react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import {Separator} from './ui/separator';
+import { Separator } from './ui/separator';
 import {
   SheetTrigger,
   Sheet,
@@ -17,23 +17,26 @@ import {
   formatPrice,
   calculateShippingCost,
   calcDistanceFrom,
-  searchLocation, searchAutocompleteLocations,
+  searchLocation,
+  searchAutocompleteLocations,
 } from '@/lib/utils';
-import {buttonVariants} from './ui/button';
-import {ScrollArea} from './ui/scroll-area';
-import {useCart} from '@/hooks/use-cart';
+import { buttonVariants } from './ui/button';
+import { ScrollArea } from './ui/scroll-area';
+import { useCart } from '@/hooks/use-cart';
 import CartItem from './CartItem';
-import AutoCompleteInput from "@/components/AutoCompleteInput";
+import AutoCompleteInput from '@/components/AutoCompleteInput';
+import { toast } from 'sonner';
 
 let settingAddress = false;
 let shipingDeets: {
   address?: string;
   street?: string;
   state?: string;
-  city?: string } = {};
+  city?: string;
+} = {};
 
 const Cart = () => {
-  const {items} = useCart();
+  const { items } = useCart();
   const itemCount = items.length;
 
   const [isMounted, setIsMounted] = useState(true);
@@ -42,6 +45,7 @@ const Cart = () => {
   const [deliveryMethod, setDeliveryMethod] = useState('pickup');
   const [distance, setDistance] = useState(0);
   const [deliveryFee, setDeliveryFee] = useState(0);
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   const [shippingDetails, setShippingDetails] = useState({
     country: 'US',
@@ -62,7 +66,7 @@ const Cart = () => {
 
   const recalculateTotal = useCallback(() => {
     const total = items.reduce(
-      (sum, {product, quantity}) => sum + product.price * quantity,
+      (sum, { product, quantity }) => sum + product.price * quantity,
       0,
     );
     setTotalPrice(total);
@@ -71,7 +75,7 @@ const Cart = () => {
 
   useEffect(() => {
     // localStorage.removeItem('delivery-details');
-    const {method, ...shippingDetails} = JSON.parse(
+    const { method, ...shippingDetails } = JSON.parse(
       localStorage.getItem('delivery-details') || '{}',
     );
     setDeliveryMethod(method || 'pickup');
@@ -96,6 +100,10 @@ const Cart = () => {
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     console.log('setting delivery method', event.target.value);
+    if (event.target.value === 'ship' && totalPrice < 50) {
+      toast.error('Shipping is only available for orders above $50.');
+      return;
+    }
     if (event.target.value === 'ship') {
       handleDistanceCalculations();
     } else {
@@ -105,7 +113,7 @@ const Cart = () => {
     setDeliveryMethod(event.target.value);
     localStorage.setItem(
       'delivery-details',
-      JSON.stringify({...shippingDetails, method: event.target.value}),
+      JSON.stringify({ ...shippingDetails, method: event.target.value }),
     );
     console.log(
       'delivery method set',
@@ -120,25 +128,25 @@ const Cart = () => {
   const handleShippingDetailChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
-    const {name, value} = event.target;
+    const { name, value } = event.target;
     console.log('name', name, 'value', value);
     setShippingDetails((prevDetails) => {
-      shipingDeets = {...prevDetails, [name]: value};
-      return {...prevDetails, [name]: value};
+      shipingDeets = { ...prevDetails, [name]: value };
+      return { ...prevDetails, [name]: value };
     });
-    if (name === "street") handleSettingAddress();
+    if (name === 'street') handleSettingAddress();
   };
 
   const fee = 1;
 
   const handleDistanceCalculations = async () => {
     if (settingAddress) setTimeout(handleDistanceCalculations, 5000);
-    else return
+    else return;
     console.log('current shipping deet', shipingDeets);
     const loc = (
       await searchLocation(
         `${shipingDeets?.street}, ${shipingDeets?.city}, ${shipingDeets?.state}, `,
-        "",
+        '',
         // shippingDetails.country,
         'NG',
       )
@@ -159,15 +167,11 @@ const Cart = () => {
     console.log('delivery fee', deliveryFee, 'dist:', dist);
     setDeliveryFee(deliveryFee);
     setShippingDetails((old) => {
-      const update = {...old,
-        address: loc?.
-
-          address};
-      setDeliveryMethod
-      ((old) => {
+      const update = { ...old, address: loc?.address };
+      setDeliveryMethod((old) => {
         localStorage.setItem(
           'delivery-details',
-          JSON.stringify({...update, method: old}),
+          JSON.stringify({ ...update, method: old }),
         );
         return old;
       });
@@ -186,6 +190,16 @@ const Cart = () => {
     settingAddress = false;
     handleDistanceCalculations();
   }
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    setFormSubmitted(true);
+    if (!shippingDetails.street || !shippingDetails.city) {
+      alert('Street Address and Town/City are required.');
+      return;
+    }
+    // Proceed with form submission
+  };
 
   return (
     <Sheet>
@@ -210,7 +224,7 @@ const Cart = () => {
             {itemCount > 0 ? (
               <>
                 <div className="flex flex-col">
-                  {items.map(({product, quantity}) => (
+                  {items.map(({ product, quantity }) => (
                     <CartItem
                       product={product}
                       key={product.id}
@@ -220,7 +234,7 @@ const Cart = () => {
                   ))}
                 </div>
                 <div className="space-y-4">
-                  <Separator/>
+                  <Separator />
                   <div className="space-y-2">
                     <div className="flex items-center space-x-2">
                       <input
@@ -278,8 +292,12 @@ const Cart = () => {
                             {/*  className="border p-1 w-full"*/}
                             {/*/>*/}
                             <AutoCompleteInput
-                              getItems={async () => await searchAutocompleteLocations(shippingDetails?.state)}
-                              resultStringKeyName={"region"}
+                              getItems={async () =>
+                                await searchAutocompleteLocations(
+                                  shippingDetails?.state,
+                                )
+                              }
+                              resultStringKeyName={'region'}
                               type="text"
                               id="state"
                               name="state"
@@ -298,8 +316,12 @@ const Cart = () => {
                             {/*  className="border p-1 w-full"*/}
                             {/*/>*/}
                             <AutoCompleteInput
-                              getItems={async () => await searchAutocompleteLocations(`${shippingDetails?.city}, ${shippingDetails?.state}`)}
-                              resultStringKeyName={"locality"}
+                              getItems={async () =>
+                                await searchAutocompleteLocations(
+                                  `${shippingDetails?.city}, ${shippingDetails?.state}`,
+                                )
+                              }
+                              resultStringKeyName={'locality'}
                               type="text"
                               id="city"
                               name="city"
@@ -308,29 +330,33 @@ const Cart = () => {
                             />
                           </div>
                           <div>
-                            <label htmlFor="
-                            address">Street Address
+                            <label
+                              htmlFor="
+                            address"
+                            >
+                              Street Address
                             </label>
                             {/*<input*/}
                             {/*  type="text"*/}
                             {/*  id="
                             address"*/}
-                            {
-                              /*  name="
+                            {/*  name="
                             address"*/}
-                            {
-                              /*  value={shippingDetails.
+                            {/*  value={shippingDetails.
                             address}*/}
-                            {
-                              /*  onChange={handleShippingDetailChange}*/}
+                            {/*  onChange={handleShippingDetailChange}*/}
                             {/*  onFocus={handleSettingAddress}*/}
                             {/*  onBlur={handleAddressSet}*/}
                             {/*  className="border p-1 w-full"*/}
                             {/*  placeholder="Street name"*/}
                             {/*/>*/}
                             <AutoCompleteInput
-                              getItems={async () => await searchAutocompleteLocations(`${shippingDetails?.street}, ${shippingDetails?.city}, ${shippingDetails?.state}`)}
-                              resultStringKeyName={"street"}
+                              getItems={async () =>
+                                await searchAutocompleteLocations(
+                                  `${shippingDetails?.street}, ${shippingDetails?.city}, ${shippingDetails?.state}`,
+                                )
+                              }
+                              resultStringKeyName={'street'}
                               type="text"
                               id="street"
                               name="street"
@@ -412,7 +438,7 @@ const Cart = () => {
                       </>
                     )}
                   </div>
-                  <Separator/>
+                  <Separator />
                   <div className="space-y-1.5 text-sm">
                     {deliveryMethod === 'ship' && (
                       <div className="flex">
