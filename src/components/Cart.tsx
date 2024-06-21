@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -26,6 +26,7 @@ import { useCart } from '@/hooks/use-cart';
 import CartItem from './CartItem';
 import AutoCompleteInput from '@/components/AutoCompleteInput';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 let settingAddress = false;
 let shipingDeets: {
@@ -37,6 +38,7 @@ let shipingDeets: {
 
 const Cart = () => {
   const { items } = useCart();
+  const router = useRouter();
   const itemCount = items.length;
 
   const [isMounted, setIsMounted] = useState(true);
@@ -78,7 +80,7 @@ const Cart = () => {
     const { method, ...shippingDetails } = JSON.parse(
       localStorage.getItem('delivery-details') || '{}',
     );
-    setDeliveryMethod(method || 'pickup');
+    // setDeliveryMethod(method || 'pickup');
     if (method === 'ship') handleDistanceCalculations();
     setShippingDetails(shippingDetails);
   }, []);
@@ -455,17 +457,54 @@ const Cart = () => {
                       <span>{formatPrice(totalPrice + fee + deliveryFee)}</span>
                     </div>
                   </div>
+                  <SheetTrigger id="close" className="h-4" asChild>
+                    <div className="h-7 w-full">{''}</div>
+                  </SheetTrigger>
                   <SheetFooter>
-                    <SheetTrigger asChild>
-                      <Link
-                        href="/cart"
-                        className={buttonVariants({
-                          className: 'w-full',
-                        })}
-                      >
-                        Continue to checkout
-                      </Link>
-                    </SheetTrigger>
+                    <Link
+                      href=""
+                      onClick={(e) => {
+                        router.prefetch('/cart');
+                        if (deliveryMethod === 'ship' && totalPrice < 50) {
+                          toast.error(
+                            'Shipping is only available for orders above $50.',
+                          );
+                          return;
+                        }
+                        if (deliveryMethod === 'ship') {
+                          let requiredShippingFields = {
+                            state: 'State',
+                            city: 'Town / City',
+                            street: 'Street Address',
+                            unit: 'House Number',
+                            phone: 'Phone Number',
+                          };
+
+                          for (const requiredField of Object.keys(
+                            requiredShippingFields,
+                          )) {
+                            if (!shippingDetails[requiredField]) {
+                              e.preventDefault();
+                              return toast.error(
+                                `You must specify ${Object.values(
+                                  requiredShippingFields,
+                                ).join(', ')}. \nYou've not specified ${
+                                  requiredShippingFields[requiredField]
+                                }`,
+                              );
+                            }
+                          }
+                        }
+                        (document.querySelector('#close') as any)?.click();
+                        console.log('about to navigate');
+                        router.push('/cart');
+                      }}
+                      className={buttonVariants({
+                        className: 'w-full',
+                      })}
+                    >
+                      Continue to checkout
+                    </Link>
                   </SheetFooter>
                 </div>
               </>
