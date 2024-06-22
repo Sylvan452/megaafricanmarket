@@ -464,6 +464,7 @@ const Cart = () => {
                     <Link
                       href=""
                       onClick={(e) => {
+                        e.preventDefault();
                         router.prefetch('/cart');
                         if (deliveryMethod === 'ship' && totalPrice < 50) {
                           toast.error(
@@ -484,13 +485,12 @@ const Cart = () => {
                             requiredShippingFields,
                           )) {
                             if (!shippingDetails[requiredField]) {
-                              e.preventDefault();
                               return toast.error(
                                 `You must specify ${Object.values(
-                                  requiredShippingFields,
-                                ).join(', ')}. \nYou've not specified ${
+                                  requiredShippingFields
+                                ).join(", ")}. \nYou've not specified ${
                                   requiredShippingFields[requiredField]
-                                }`,
+                                }`
                               );
                             }
                           }
