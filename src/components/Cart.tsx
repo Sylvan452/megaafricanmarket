@@ -150,7 +150,7 @@ const Cart = () => {
         `${shipingDeets?.street}, ${shipingDeets?.city}, ${shipingDeets?.state}, `,
         '',
         // shippingDetails.country,
-        'NG',
+        'CA,CAN,US,USA',
       )
     )?.[0];
 
@@ -499,7 +499,7 @@ const Cart = () => {
                         console.log('about to navigate');
                         router.push('/cart');
                       }}
-                      className={buttonVariants({
+                      className=itude{buttonVariants({
                         className: 'w-full',
                       })}
                     >

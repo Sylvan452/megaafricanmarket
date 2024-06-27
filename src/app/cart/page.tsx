@@ -60,7 +60,7 @@ const Page = () => {
           shippingDetails?.address,
           shippingDetails?.city,
           // shippingDetails.country,
-          'NG',
+          'CA,CAN,US,USA',
         );
         // @ts-ignore
         setDeliveryFee(deliveryCost!);

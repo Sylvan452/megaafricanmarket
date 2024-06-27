@@ -45,10 +45,12 @@ export interface ILocation {
   longitude: number;
   latitude: number;
 }
+// -76.750699,
+//           39.335998
 
 export const STORE_LOCATION: ILocation = {
-  longitude: 7.4481664,
-  latitude: 9.0570752,
+  longitude: -76.750699,
+  latitude: 39.335998,
 };
 // const STORE_LOCATION: ILocation = {
 //   longitude: -104.99870832482931,
@@ -63,7 +65,8 @@ async function calcDistance(start: ILocation, end: ILocation) {
       headers: {
         Accept:
           'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
-        Authorization: '5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0',
+        Authorization:
+          '5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0',
         'Content-Type': 'application/json; charset=utf-8',
       },
       data: {
@@ -78,10 +81,13 @@ async function calcDistance(start: ILocation, end: ILocation) {
       },
     });
 
-    console.log('calculated distance', res.data?.routes?.[0]?.summary?.distance);
+    console.log(
+      'calculated distance',
+      res.data?.routes?.[0]?.summary?.distance,
+    );
     return res.data?.routes?.[0]?.summary?.distance;
   } catch (err) {
-    console.log('err ocured calculating distance', err)
+    console.log('err ocured calculating distance', err);
   }
 }
 
@@ -94,9 +100,14 @@ export async function calcDistanceFrom(destination: ILocation) {
 //   { longitude: 3.3792057, latitude: 6.5243793 },
 // );
 
-export const countriesSet = new Set(['CA', 'CAN', 'US', 'USA', 'NG']);
-// export const defaultCountryParam = 'CA,CAN,US,USA';
-export const defaultCountryParam = 'NG';
+export const countriesSet = new Set([
+  'CA',
+  'CAN',
+  'US',
+  'USA',
+  'CA,CAN,US,USA',
+]);
+export const defaultCountryParam = 'CA,CAN,US,USA';
 
 export async function searchLocation(
   address: string = '',
@@ -112,7 +123,9 @@ export async function searchLocation(
   try {
     res = await axios({
       method: 'get',
-      url: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/location/search?${searchParam.toString()}`,
+      url: `${
+        process.env.NEXT_PUBLIC_SERVER_URL
+      }/api/location/search?${searchParam.toString()}`,
       // url: `https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0&text=40%20Ajose%20Adeogun%20Abuja&boundary.country=NG`,
       headers: {
         Accept:
@@ -166,7 +179,9 @@ export async function searchAutocompleteLocations(
     res = await axios({
       method: 'get',
       // url: `https://api.openrouteservice.org/geocode/autocomplete?api_key=5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0&${searchParam.toString()}&boundary.country=${countryCode}`,
-      url: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/location/search?${searchParam.toString()}`,
+      url: `${
+        process.env.NEXT_PUBLIC_SERVER_URL
+      }/api/location/search?${searchParam.toString()}`,
       headers: {
         Accept:
           'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
@@ -199,10 +214,6 @@ export async function searchAutocompleteLocations(
   return result || [];
 }
 
-// searchLocation('Banex', 'Abuja', 'NG').then((res: Array<any>) => {
-//   calcDistance(STORE_LOCATION, res[0].location);
-// });
-
 // Response: {"error":{"code":2010,"message":"Could not find routable point within a radius of 350.0 meters of specified coordinate 0: -91.8678050 31.1695460.; Could not find routable point within a radius of 350.0 meters of specified coordinate 1: -89.3294675 31.9881085."},"info":{"engine":{"build_date":"2024-05-14T10:47:52Z","version":"8.0.1"},"timestamp":1717846488686}}
 
 export async function getDeliverFeeForLocation(
@@ -216,7 +227,7 @@ export async function getDeliverFeeForLocation(
       address,
       city,
       // shippingDetails.country,
-      'NG',
+      'CA,CAN,US,USA',
     )
   )?.[0];
 
@@ -247,7 +258,7 @@ export async function getDeliverDistForLocation(
       address,
       city,
       // shippingDetails.country,
-      'NG',
+      'CA,CAN,US,USA',
     )
   )?.[0];
 
