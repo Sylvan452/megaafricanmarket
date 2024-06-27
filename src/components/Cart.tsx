@@ -244,7 +244,7 @@ const Cart = () => {
                         id="pickup"
                         name="deliveryMethod"
                         value="pickup"
-                        checked={deliveryMethod === 'pickup'}
+                        checked={deliveryMethod === "pickup"}
                         onChange={handleDeliveryMethodChange}
                       />
                       <label htmlFor="pickup">Pick Up</label>
@@ -255,18 +255,18 @@ const Cart = () => {
                         id="ship"
                         name="deliveryMethod"
                         value="ship"
-                        checked={deliveryMethod === 'ship'}
+                        checked={deliveryMethod === "ship"}
                         onChange={handleDeliveryMethodChange}
                       />
                       <label htmlFor="ship">
-                        Ship{' '}
+                        Ship{" "}
                         <span className="text-xs block sm:inline">
                           (Free shipping within 5 miles; additional charges may
                           apply)
                         </span>
                       </label>
                     </div>
-                    {deliveryMethod === 'ship' && (
+                    {deliveryMethod === "ship" && (
                       <>
                         <div className="mt-4 space-y-2">
                           <div>
@@ -296,10 +296,10 @@ const Cart = () => {
                             <AutoCompleteInput
                               getItems={async () =>
                                 await searchAutocompleteLocations(
-                                  shippingDetails?.state,
+                                  shippingDetails?.state
                                 )
                               }
-                              resultStringKeyName={'region'}
+                              resultStringKeyName={"region"}
                               type="text"
                               id="state"
                               name="state"
@@ -320,10 +320,10 @@ const Cart = () => {
                             <AutoCompleteInput
                               getItems={async () =>
                                 await searchAutocompleteLocations(
-                                  `${shippingDetails?.city}, ${shippingDetails?.state}`,
+                                  `${shippingDetails?.city}, ${shippingDetails?.state}`
                                 )
                               }
-                              resultStringKeyName={'locality'}
+                              resultStringKeyName={"locality"}
                               type="text"
                               id="city"
                               name="city"
@@ -355,10 +355,10 @@ const Cart = () => {
                             <AutoCompleteInput
                               getItems={async () =>
                                 await searchAutocompleteLocations(
-                                  `${shippingDetails?.street}, ${shippingDetails?.city}, ${shippingDetails?.state}`,
+                                  `${shippingDetails?.street}, ${shippingDetails?.city}, ${shippingDetails?.state}`
                                 )
                               }
-                              resultStringKeyName={'street'}
+                              resultStringKeyName={"street"}
                               type="text"
                               id="street"
                               name="street"
@@ -442,7 +442,7 @@ const Cart = () => {
                   </div>
                   <Separator />
                   <div className="space-y-1.5 text-sm">
-                    {deliveryMethod === 'ship' && (
+                    {deliveryMethod === "ship" && (
                       <div className="flex">
                         <span className="flex-1">Shipping</span>
                         <span>{formatPrice(deliveryFee)}</span>
@@ -458,31 +458,31 @@ const Cart = () => {
                     </div>
                   </div>
                   <SheetTrigger id="close" className="h-4" asChild>
-                    <div className="h-7 w-full">{''}</div>
+                    <div className="h-7 w-full">{""}</div>
                   </SheetTrigger>
                   <SheetFooter>
                     <Link
                       href=""
                       onClick={(e) => {
                         e.preventDefault();
-                        router.prefetch('/cart');
-                        if (deliveryMethod === 'ship' && totalPrice < 50) {
+                        router.prefetch("/cart");
+                        if (deliveryMethod === "ship" && totalPrice < 50) {
                           toast.error(
-                            'Shipping is only available for orders above $50.',
+                            "Shipping is only available for orders above $50."
                           );
                           return;
                         }
-                        if (deliveryMethod === 'ship') {
+                        if (deliveryMethod === "ship") {
                           let requiredShippingFields = {
-                            state: 'State',
-                            city: 'Town / City',
-                            street: 'Street Address',
-                            unit: 'House Number',
-                            phone: 'Phone Number',
+                            state: "State",
+                            city: "Town / City",
+                            street: "Street Address",
+                            unit: "House Number",
+                            phone: "Phone Number",
                           };
 
                           for (const requiredField of Object.keys(
-                            requiredShippingFields,
+                            requiredShippingFields
                           )) {
                             if (!shippingDetails[requiredField]) {
                               return toast.error(
@@ -495,12 +495,12 @@ const Cart = () => {
                             }
                           }
                         }
-                        (document.querySelector('#close') as any)?.click();
-                        console.log('about to navigate');
-                        router.push('/cart');
+                        (document.querySelector("#close") as any)?.click();
+                        console.log("about to navigate");
+                        router.push("/cart");
                       }}
-                      className=itude{buttonVariants({
-                        className: 'w-full',
+                      className={buttonVariants({
+                        className: "w-full",
                       })}
                     >
                       Continue to checkout
@@ -525,9 +525,9 @@ const Cart = () => {
                   <Link
                     href="/products"
                     className={buttonVariants({
-                      variant: 'link',
-                      size: 'sm',
-                      className: 'text-sm text-muted-foreground',
+                      variant: "link",
+                      size: "sm",
+                      className: "text-sm text-muted-foreground",
                     })}
                   >
                     Begin Checkout: Add Items to Your Cart
