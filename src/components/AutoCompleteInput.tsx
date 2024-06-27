@@ -20,41 +20,26 @@ export default function AutoCompleteInput({
 
   useEffect(() => {
     (async () => {
-      const newItems = (await getItems()) || [];
-      setItems((oldItems) => {
-        if (!newItems?.length) return oldItems || [];
-        return newItems || [];
-      });
+      let newItems = [];
+      try {
+        newItems = await getItems();
+      } catch {
+        console.log('error occured while setting new items');
+        newItems = [];
+      }
+      if (Array.isArray(newItems)) {
+        setItems((oldItems) => {
+          if (!newItems?.length) return oldItems;
+          return newItems;
+        });
+      }
     })();
   }, [name, value]);
 
   return (
     <>
       <ReactSearchAutocomplete
-        items={
-          items || [
-            {
-              id: 0,
-              name: 'Cobol',
-            },
-            {
-              id: 1,
-              name: 'JavaScript',
-            },
-            {
-              id: 2,
-              name: 'Basic',
-            },
-            {
-              id: 3,
-              name: 'PHP',
-            },
-            {
-              id: 4,
-              name: 'Java',
-            },
-          ]
-        }
+        items={items || []}
         inputSearchString={value}
         onSearch={(string, results) => {
           onChange({
@@ -81,7 +66,7 @@ export default function AutoCompleteInput({
             },
           });
         }}
-        showItemsOnFocus={true}
+        showItemsOnFocus={false}
         showIcon={false}
         maxResults={5}
         {...otherProps}

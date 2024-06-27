@@ -80,7 +80,7 @@ const Cart = () => {
     const { method, ...shippingDetails } = JSON.parse(
       localStorage.getItem('delivery-details') || '{}',
     );
-    setDeliveryMethod(method || 'pickup');
+    // setDeliveryMethod(method || 'pickup');
     if (method === 'ship') handleDistanceCalculations();
     setShippingDetails(shippingDetails);
   }, []);
@@ -501,6 +501,13 @@ const Cart = () => {
                         }
                         (document.querySelector('#close') as any)?.click();
                         console.log('about to navigate');
+                        localStorage.setItem(
+                          'delivery-details',
+                          JSON.stringify({
+                            ...shippingDetails,
+                            method: deliveryMethod,
+                          }),
+                        );
                         router.push('/cart');
                       }}
                       className={buttonVariants({
