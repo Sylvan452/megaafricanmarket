@@ -221,9 +221,9 @@ export const Products: CollectionConfig = {
         update: () => false,
       },
       type: 'text',
-      // admin: {
-      //   hidden: true,
-      // },
+      admin: {
+        hidden: true,
+      },
     },
     {
       name: 'stripeId',
