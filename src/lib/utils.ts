@@ -139,6 +139,8 @@ export async function searchLocation(
     return [];
   }
 
+  console.log('res', res);
+
   const result = res.data?.features?.map?.(
     (f: {
       properties: {
@@ -218,22 +220,24 @@ export async function searchAutocompleteLocations(
 
 export async function getDeliverFeeForLocation(
   address: string,
-  city: string,
+  city: string = '',
   country: string,
 ) {
   // console.log('current shipping deet', shippingDetails);
   const loc = (
     await searchLocation(
       address,
-      city,
+      // city,
       // shippingDetails.country,
-      'CA,CAN,US,USA',
+      // 'CA,CAN,US,USA',
     )
   )?.[0];
 
   console.log('got location', loc);
 
   // if (!loc?.isConfident) return;
+
+  if (!loc) return;
 
   const dist = await calcDistanceFrom(loc?.location);
   console.log('got dist', dist);
