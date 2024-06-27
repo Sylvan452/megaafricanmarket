@@ -156,7 +156,7 @@ const start = async () => {
         // url: `https://api.openrouteservice.org/geocode/autocomplete?api_key=5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0&${searchParam.toString()}&boundary.country=${countryCode}`,
         url: `https://api.openrouteservice.org/geocode/${
           req?.query?.mode || 'autocomplete'
-        }?api_key=5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0&${searchParam.toString()}&boundary.country=NG`,
+        }?api_key=5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0&${searchParam.toString()}&boundary.country=CA,CAN,US,USA`,
         headers: {
           Accept:
             'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
