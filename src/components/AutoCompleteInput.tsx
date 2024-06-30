@@ -17,9 +17,14 @@ export default function AutoCompleteInput({
   const [items, setItems] = useState([]);
   const [showingResults, setShowingResults] = useState(false);
   const [val, setVal] = useState(value || '');
+  const [timeSinceApiCall, setTimeSinceApiCall] = useState(new Date());
 
   useEffect(() => {
     (async () => {
+      if (new Date().getTime() - timeSinceApiCall.getTime() < 2000) {
+        return;
+      }
+      setTimeSinceApiCall(new Date());
       let newItems = [];
       try {
         newItems = await getItems();
