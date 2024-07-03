@@ -10,9 +10,28 @@ import { stripeWebhookHandler } from './webhooks';
 import nextBuild from 'next/dist/build';
 import path from 'path';
 import axios from 'axios';
+import cors from 'cors';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
+const corsOptions = {
+  origin: [
+    /\.megaafricanmarket\.com$/,
+    'https://megaafricanmarket.com',
+    'http://megaafricanmarket.com',
+    'https://www.megaafricanmarket.com',
+    'http://www.megaafricanmarket.com',
+    'https://megaafricanmarket-production-b5f4.up.railway.app',
+    'http://megaafricanmarket-production-b5f4.up.railway.app',
+  ],
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  optionsSuccessStatus: 200,
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
+app.options('*', cors(corsOptions));
 
 const createContext = ({
   req,

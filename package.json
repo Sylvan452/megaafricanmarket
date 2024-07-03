@@ -12,7 +12,6 @@
     "serve": "chmod +x setup-tunnel.sh && ./setup-tunnel.sh 3000",
     "generate:types": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts payload generate:types",
     "copyfiles": "copyfiles -u 1 \"src/**/*.{html,css,scss,ttf,woff,woff2,eot,svg,jpg,png}\" dist/"
-
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
@@ -40,6 +39,7 @@
     "body": "^5.1.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "cors": "^2.8.5",
     "date-fns": "^2.30.0",
     "dotenv": "^16.4.5",
     "dropdown": "^0.2.0",

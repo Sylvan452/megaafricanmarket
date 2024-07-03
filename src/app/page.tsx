@@ -100,7 +100,7 @@ export default function Home({
         <>
           <MaxWidthWrapper>
             <div className="flex flex-col md:flex-row">
-              <div className="md:w-1/2 py-20 mx-auto text-center flex flex-col items-center max-w-3xl md:pr-12">
+              <div className="md:w-1/2 py-10 mx-auto text-center flex flex-col items-center max-w-3xl md:pr-12">
                 <h1 className="text-4xl font-bold tracking-tight text-gray-800 sm:text-5xl">
                   Explore Your Ultimate One-Stop Shop for High Quality, Fresh{' '}
                   <span
