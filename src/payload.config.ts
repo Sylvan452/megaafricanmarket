@@ -20,8 +20,7 @@ const editor = slateEditor({}) as unknown as RichTextAdapter<any[], any, any>;
 export default buildConfig({
   // serverURL: process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000',
   serverURL:
-    process.env.NEXT_PUBLIC_SERVER_URL ||
-    'https://megaafricanmarket-production-b5f4.up.railway.app',
+    process.env.NEXT_PUBLIC_SERVER_URL || 'https://www.megaafricanmarket.com',
   collections: [Users, Products, Media, Orders],
   routes: {
     admin: '/sell',

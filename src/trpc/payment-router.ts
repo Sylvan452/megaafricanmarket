@@ -1,5 +1,10 @@
 import { z } from 'zod';
-import { privateProcedure, publicOrPrivateProcedure, publicProcedure, router } from './trpc';
+import {
+  privateProcedure,
+  publicOrPrivateProcedure,
+  publicProcedure,
+  router,
+} from './trpc';
 import { TRPCError } from '@trpc/server';
 import { getPayloadClient } from '../get-payload';
 import { stripe } from '../lib/stripe';
@@ -214,8 +219,14 @@ export const paymentRouter = router({
 
         // Create Stripe checkout session
         const stripeSession = await stripe.checkout.sessions.create({
-          success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/thank-you?orderId=${order.id}`,
-          cancel_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/cart`,
+          success_url: `${
+            process.env.NEXT_PUBLIC_SERVER_URL ||
+            'https://www.megaafricanmarket.com'
+          }/thank-you?orderId=${order.id}`,
+          cancel_url: `${
+            process.env.NEXT_PUBLIC_SERVER_URL ||
+            'https://www.megaafricanmarket.com'
+          }/cart`,
           // payment_method_types: ['card', 'paypal'],
           mode: 'payment',
           metadata: {

@@ -6,24 +6,30 @@ export const Users: CollectionConfig = {
   auth: {
     verify: {
       generateEmailHTML: ({ token }) => {
-        console.log("verify email, generation")
+        console.log('verify email, generation');
         return PrimaryActionEmailHtml({
           actionLabel: 'Verify Your Account',
           buttonText: 'Verify Your Account',
-          href: `${process.env.NEXT_PUBLIC_SERVER_URL}/verify-email?token=${token}`,
+          href: `${
+            process.env.NEXT_PUBLIC_SERVER_URL ||
+            'https://www.megaafricanmarket.com'
+          }/verify-email?token=${token}`,
         });
       },
     },
     forgotPassword: {
       generateEmailHTML: ({ req, token, user }) => {
-        console.log("forgot password, generation")
+        console.log('forgot password, generation');
         return PrimaryActionEmailHtml({
           actionLabel: 'Reset Your Password',
           buttonText: 'Reset Password',
-          href: `${process.env.NEXT_PUBLIC_SERVER_URL}/change-password?token=${token}`,
-        })
+          href: `${
+            process.env.NEXT_PUBLIC_SERVER_URL ||
+            'https://www.megaafricanmarket.com'
+          }/change-password?token=${token}`,
+        });
       },
-    }
+    },
   },
   access: {
     read: () => true,
