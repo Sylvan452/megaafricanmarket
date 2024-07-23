@@ -11,6 +11,7 @@ import nextBuild from 'next/dist/build';
 import path from 'path';
 import axios from 'axios';
 import cors from 'cors';
+import { redirect } from 'next/dist/server/api-utils';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -29,6 +30,23 @@ const corsOptions = {
   credentials: true,
 };
 
+app.use((req, res, next) => {
+  console.log(
+    'requesting from',
+    req.hostname,
+    'and ENV is',
+    process.env.NODE_ENV,
+  );
+  if (
+    process.env.NODE_ENV === 'production' &&
+    !req.hostname.includes('www.megaafricanmarket.com')
+  ) {
+    console.log('redirecting to main host');
+    return res.redirect('https://www.megaafricanmarket.com');
+  }
+
+  next();
+});
 app.use(cors(corsOptions));
 
 app.options('*', cors(corsOptions));
