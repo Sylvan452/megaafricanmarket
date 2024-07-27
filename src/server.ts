@@ -12,6 +12,7 @@ import path from 'path';
 import axios from 'axios';
 import cors from 'cors';
 import { redirect } from 'next/dist/server/api-utils';
+import { readdir } from 'fs/promises';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -30,23 +31,23 @@ const corsOptions = {
   credentials: true,
 };
 
-app.use((req, res, next) => {
-  console.log(
-    'requesting from',
-    req.hostname,
-    'and ENV is',
-    process.env.NODE_ENV,
-  );
-  if (
-    process.env.NODE_ENV === 'production' &&
-    !req.hostname.includes('www.megaafricanmarket.com')
-  ) {
-    console.log('redirecting to main host');
-    return res.redirect('https://www.megaafricanmarket.com');
-  }
+// app.use((req, res, next) => {
+//   console.log(
+//     'requesting from',
+//     req.hostname,
+//     'and ENV is',
+//     process.env.NODE_ENV,
+//   );
+//   if (
+//     process.env.NODE_ENV === 'production' &&
+//     !req.hostname.includes('www.megaafricanmarket.com')
+//   ) {
+//     console.log('redirecting to main host');
+//     return res.redirect('https://www.megaafricanmarket.com');
+//   }
 
-  next();
-});
+//   next();
+// });
 app.use(cors(corsOptions));
 
 app.options('*', cors(corsOptions));
@@ -209,6 +210,13 @@ const start = async () => {
     console.log('found search for', searchParam.toString());
     return res.send(resp?.data);
   });
+
+  app.get('/api/list-media', async (req, res) => {
+    const files = await readdir(__dirname + '/media');
+    console.log(files);
+    res.send(files.join('<br />\n'));
+  });
+
   app.use((req, res) => nextHandler(req, res));
 
   nextApp.prepare().then(() => {
