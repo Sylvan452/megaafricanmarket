@@ -52,6 +52,7 @@
     "node-fetch": "2",
     "nodemailer": "^6.9.13",
     "payload": "^2.16.1",
+    "payload-cloudinary-plugin": "^0.1.11",
     "react": "^18.3.1",
     "react-dom": "^18",
     "react-hook-form": "^7.51.4",
