@@ -12,46 +12,52 @@ import path from 'path';
 import axios from 'axios';
 import cors from 'cors';
 import { redirect } from 'next/dist/server/api-utils';
-import { mediaManagement } from "payload-cloudinary-plugin";
+import { mediaManagement } from 'payload-cloudinary-plugin';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 const corsOptions = {
   origin: [
     /\.megaafricanmarket\.com$/,
-    "https://megaafricanmarket.com",
-    "http://megaafricanmarket.com",
-    "https://www.megaafricanmarket.com",
-    "http://www.megaafricanmarket.com",
-    "https://megaafricanmarket-production-b5f4.up.railway.app",
-    "http://megaafricanmarket-production-b5f4.up.railway.app",
+    'https://megaafricanmarket.com',
+    'http://megaafricanmarket.com',
+    'https://www.megaafricanmarket.com',
+    'http://www.megaafricanmarket.com',
+    'https://megaafricanmarket-production-b5f4.up.railway.app',
+    'http://megaafricanmarket-production-b5f4.up.railway.app',
   ],
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   optionsSuccessStatus: 200,
   credentials: true,
 };
 
 app.use((req, res, next) => {
   console.log(
-    "requesting from",
+    'requesting from',
     req.hostname,
-    "and ENV is",
-    process.env.NODE_ENV
+    'and ENV is',
+    process.env.NODE_ENV,
   );
   if (
-    process.env.NODE_ENV === "production" &&
-    !req.hostname.includes("www.megaafricanmarket.com")
+    process.env.NODE_ENV === 'production' &&
+    !req.hostname.includes('www.megaafricanmarket.com')
   ) {
-    console.log("redirecting to main host");
-    return res.redirect("https://www.megaafricanmarket.com");
+    console.log('redirecting to main host');
+    return res.redirect('https://www.megaafricanmarket.com');
   }
 
   next();
 });
 app.use(cors(corsOptions));
 
-app.options("*", cors(corsOptions));
-app.use(mediaManagement());
+app.options('*', cors(corsOptions));
+app.use(
+  mediaManagement({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  }),
+);
 
 const createContext = ({
   req,
@@ -184,31 +190,31 @@ const start = async () => {
       res.status(500).json({ error: 'Failed to fetch orders' });
     }
   });
-  app.get("/api/location/search", async (req, res) => {
+  app.get('/api/location/search', async (req, res) => {
     const searchParam = new URLSearchParams();
-    searchParam.append("text", `${req.query?.text}`);
-    console.log("sending req with", searchParam.toString());
+    searchParam.append('text', `${req.query?.text}`);
+    console.log('sending req with', searchParam.toString());
     let resp;
     try {
       resp = await axios({
-        method: "get",
+        method: 'get',
         // url: `https://api.openrouteservice.org/geocode/autocomplete?api_key=5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0&${searchParam.toString()}&boundary.country=${countryCode}`,
         url: `https://api.openrouteservice.org/geocode/${
-          req?.query?.mode || "autocomplete"
+          req?.query?.mode || 'autocomplete'
         }?api_key=5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0&${searchParam.toString()}&boundary.country=CA,CAN,US,USA`,
         headers: {
           Accept:
-            "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8",
+            'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
           Authorization:
-            "5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0",
+            '5b3ce3597851110001cf624874d084aa86bb4310b3e4853c62e544b0',
         },
       });
     } catch (err) {
-      console.log("error occurred while searching", err);
+      console.log('error occurred while searching', err);
       return res.send([]);
     }
     // console.log("found search", resp?.data)
-    console.log("found search for", searchParam.toString());
+    console.log('found search for', searchParam.toString());
     return res.send(resp?.data);
   });
   app.use((req, res) => nextHandler(req, res));
